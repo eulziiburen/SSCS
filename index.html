@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Тал Аялал</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --sky:#2B5C8A; --sky-deep:#173A5C; --saffron:#E0891B; --grass:#4F7A34;
+  --ink:#15212C; --muted:#5B6873; --bg:#F3F6F7; --surface:#FFFFFF; --line:#DCE3E7;
+  --chip:#E6EEF4; --on-accent:#FFFFFF; --shadow:0 10px 30px rgba(21,33,44,.10);
+  --display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --sky:#6FA3D6; --sky-deep:#0E1F30; --saffron:#F0A040; --grass:#8DBA6B;
+    --ink:#E7EDF2; --muted:#9AA8B4; --bg:#0F1720; --surface:#17222D; --line:#26343F;
+    --chip:#1F2E3B; --on-accent:#10161C; --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --sky:#6FA3D6; --sky-deep:#0E1F30; --saffron:#F0A040; --grass:#8DBA6B;
+  --ink:#E7EDF2; --muted:#9AA8B4; --bg:#0F1720; --surface:#17222D; --line:#26343F;
+  --chip:#1F2E3B; --on-accent:#10161C; --shadow:0 10px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+a{color:inherit}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+.wrap{max-width:1180px;margin-inline:auto;padding-inline:20px}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--saffron);outline-offset:2px;border-radius:6px}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:24px;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:17px;text-decoration:none;letter-spacing:.02em}
+.logo svg{flex:none}
+.nav{display:flex;gap:22px;margin-left:auto;font-weight:600}
+.nav a{text-decoration:none;color:var(--muted)}
+.nav a:hover{color:var(--ink)}
+.btn{border:0;border-radius:999px;padding:10px 18px;font-weight:700;background:var(--saffron);color:var(--on-accent)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn:hover{filter:brightness(1.06)}
+@media (max-width:760px){.nav{display:none}.top .btn.ghost{margin-left:auto}}
+
+/* hero */
+.hero{position:relative;overflow:hidden;background:var(--sky-deep);color:#fff}
+.slides{position:relative;height:clamp(380px,56vw,520px)}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity .8s ease}
+.slide.on{opacity:1}
+.slide svg.art{position:absolute;inset:0;width:100%;height:100%}
+.slide .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,20,32,.72) 0%,rgba(10,20,32,.25) 60%,rgba(10,20,32,0) 100%)}
+.slide .txt{position:relative;height:100%;display:flex;flex-direction:column;justify-content:center;gap:14px;max-width:640px;padding-block:40px 110px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#FFD08A}
+.slide h1{font-size:clamp(26px,4.2vw,46px);font-weight:800}
+.route{font-family:var(--mono);font-size:14px;opacity:.9}
+.slide .btn{align-self:flex-start;margin-top:6px}
+.dots{position:absolute;right:20px;bottom:120px;display:flex;gap:8px;z-index:3}
+.dots button{width:28px;height:4px;border-radius:2px;border:0;background:rgba(255,255,255,.35);padding:0}
+.dots button.on{background:#FFD08A}
+@media (max-width:760px){.dots{bottom:auto;top:16px}}
+
+/* search */
+.search{position:relative;z-index:4;margin-top:-72px}
+.search form{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:18px;display:grid;grid-template-columns:1.3fr 1fr 1fr auto;gap:12px;align-items:end;border:1px solid var(--line)}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.field input,.field select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+.search .btn{height:46px;padding-inline:26px}
+@media (max-width:820px){.search form{grid-template-columns:1fr 1fr}.search .btn{grid-column:1/-1}}
+@media (max-width:480px){.search form{grid-template-columns:1fr}}
+
+/* sections */
+section.block{padding-block:64px 8px}
+.head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px;margin-bottom:24px}
+.head h2{font-size:clamp(22px,2.6vw,30px);font-weight:700}
+.head p{margin:6px 0 0;color:var(--muted);max-width:60ch}
+.tabs{display:flex;gap:6px;background:var(--chip);padding:5px;border-radius:999px;flex-wrap:wrap}
+.tabs button{border:0;background:transparent;color:var(--muted);padding:8px 16px;border-radius:999px;font-weight:700}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .2s ease,box-shadow .2s ease}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.card .pic{position:relative;aspect-ratio:16/10;max-width:100%}
+.card .pic svg{position:absolute;inset:0;width:100%;height:100%}
+.badge{position:absolute;top:12px;left:12px;font-size:11px;font-weight:800;letter-spacing:.08em;padding:5px 10px;border-radius:999px;background:var(--saffron);color:#1B1206}
+.badge.hot{background:#D9432F;color:#fff}
+.country{position:absolute;bottom:12px;left:12px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.92);color:#15212C}
+.card .body{padding:16px;display:flex;flex-direction:column;gap:10px;flex:1}
+.card h3{font-family:var(--body);font-size:15.5px;font-weight:800;line-height:1.3;text-transform:uppercase;letter-spacing:.01em}
+.meta{display:flex;flex-wrap:wrap;gap:8px 14px;font-family:var(--mono);font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.meta span{display:inline-flex;align-items:center;gap:5px}
+.foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:12px;border-top:1px dashed var(--line)}
+.price{font-family:var(--mono);font-weight:700;font-size:18px;font-variant-numeric:tabular-nums}
+.price small{display:block;font-family:var(--body);font-weight:500;font-size:11px;color:var(--muted)}
+.card .btn{padding:9px 16px;font-size:14px}
+.empty{padding:40px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:16px}
+
+/* voucher */
+.voucher{margin-top:64px;border-radius:22px;overflow:hidden;display:grid;grid-template-columns:1.2fr 1fr;background:var(--sky);color:#fff}
+.voucher .v-txt{padding:36px;display:flex;flex-direction:column;gap:14px;justify-content:center}
+.voucher h2{font-size:clamp(22px,2.6vw,30px)}
+.voucher p{margin:0;max-width:52ch;opacity:.92}
+.voucher .btn{align-self:flex-start}
+.ticket{position:relative;margin:28px;background:#FFF7EA;color:#2A1B06;border-radius:14px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;align-self:center;transform:rotate(-2deg)}
+.ticket::before,.ticket::after{content:"";position:absolute;top:50%;width:22px;height:22px;border-radius:50%;background:var(--sky);transform:translateY(-50%)}
+.ticket::before{left:-11px}.ticket::after{right:-11px}
+.ticket .t-l{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8A5A12}
+.ticket .t-v{font-family:var(--display);font-weight:800;font-size:28px}
+.ticket .t-n{font-family:var(--mono);font-size:12px;border-top:1.5px dashed #D9B77E;padding-top:8px}
+@media (max-width:760px){.voucher{grid-template-columns:1fr}.voucher .v-txt{padding:26px}}
+
+/* services */
+.svc{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.svc article{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.svc .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--chip);color:var(--sky)}
+.svc h3{font-family:var(--body);font-size:15px;font-weight:800}
+.svc p{margin:0;color:var(--muted);font-size:13.5px}
+@media (max-width:1000px){.svc{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:640px){.svc{grid-template-columns:1fr 1fr}}
+@media (max-width:420px){.svc{grid-template-columns:1fr}}
+
+/* reviews */
+.revs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.rev{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:14px}
+.stars{color:var(--saffron);letter-spacing:2px}
+.rev q{font-size:15px;quotes:"“" "”"}
+.who{display:flex;align-items:center;gap:10px;margin-top:auto}
+.av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:var(--grass);color:#fff}
+.who small{display:block;color:var(--muted);font-family:var(--mono);font-size:11.5px}
+@media (max-width:860px){.revs{grid-template-columns:1fr}}
+
+/* news */
+.news{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.news a{display:flex;flex-direction:column;gap:8px;text-decoration:none;padding:18px;border-radius:14px;border:1px solid var(--line);background:var(--surface)}
+.news a:hover h3{color:var(--sky)}
+.news time{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.news h3{font-family:var(--body);font-size:15px;font-weight:800;line-height:1.35}
+.news p{margin:0;color:var(--muted);font-size:13.5px}
+@media (max-width:860px){.news{grid-template-columns:1fr}}
+
+/* footer */
+footer{margin-top:72px;background:var(--sky-deep);color:#D7E2EC;padding-block:44px 28px}
+footer .cols{display:grid;grid-template-columns:1.4fr 1fr 1.4fr;gap:28px}
+footer h4{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#FFD08A;margin:0 0 12px}
+footer ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+footer a{text-decoration:none}
+footer a:hover{color:#fff}
+footer .logo{color:#fff;margin-bottom:10px}
+footer .copy{margin-top:32px;padding-top:18px;border-top:1px solid rgba(255,255,255,.12);font-size:12.5px;color:#9FB3C5}
+.sel{user-select:all;font-family:var(--mono);font-size:13px}
+@media (max-width:760px){footer .cols{grid-template-columns:1fr}}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(8,14,20,.55);display:grid;place-items:center;padding:16px}
+.dlg{background:var(--surface);color:var(--ink);border-radius:18px;width:min(520px,100%);max-height:calc(100% - 32px);overflow:auto;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
+.dlg h3{font-size:18px}
+.dlg .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dlg .actions{display:flex;justify-content:flex-end;gap:10px}
+.sum{background:var(--chip);border-radius:12px;padding:12px 14px;font-family:var(--mono);font-size:13px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.err{color:#D9432F;font-size:13px;margin:0}
+.ok{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.ok .big{font-family:var(--display);font-size:20px}
+.code{font-family:var(--mono);font-weight:700;background:var(--chip);padding:4px 10px;border-radius:8px}
+@media (max-width:420px){.dlg .row{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="Тал Аялал нүүр">
+      <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="var(--sky)"/><circle cx="21" cy="11" r="4" fill="#FFD08A"/><path d="M1 22 L10 13 L16 19 L21 15 L31 23 A15 15 0 0 1 1 22Z" fill="var(--grass)"/></svg>
+      ТАЛ АЯЛАЛ
+    </a>
+    <nav class="nav" aria-label="Үндсэн цэс">
+      <a href="#tours">Аялалууд</a>
+      <a href="#upcoming">Ойрын аялал</a>
+      <a href="#services">Үйлчилгээ</a>
+      <a href="#news">Мэдээ</a>
+      <a href="#contact">Холбоо барих</a>
+    </nav>
+    <button class="btn ghost" id="loginBtn" type="button">Нэвтрэх</button>
+  </div>
+</header>
+
+<div id="top" class="hero">
+  <div class="slides" id="slides"></div>
+  <div class="dots" id="dots" role="tablist" aria-label="Онцлох аялал"></div>
+</div>
+
+<div class="wrap search">
+  <form id="searchForm" role="search">
+    <div class="field">
+      <label for="q">Хаашаа аялах вэ?</label>
+      <input id="q" type="text" placeholder="Жишээ: Байгал, Хайнан, Хөвсгөл">
+    </div>
+    <div class="field">
+      <label for="month">Сар</label>
+      <select id="month">
+        <option value="">Бүх сар</option>
+        <option value="9">9-р сар</option>
+        <option value="10">10-р сар</option>
+        <option value="11">11-р сар</option>
+        <option value="12">12-р сар</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="budget">Төсөв</label>
+      <select id="budget">
+        <option value="">Хязгааргүй</option>
+        <option value="1000000">1 сая ₮ хүртэл</option>
+        <option value="2500000">2.5 сая ₮ хүртэл</option>
+        <option value="4000000">4 сая ₮ хүртэл</option>
+      </select>
+    </div>
+    <button class="btn" type="submit">Хайх</button>
+  </form>
+</div>
+
+<main>
+  <section class="block wrap" id="tours">
+    <div class="head">
+      <div>
+        <h2 id="toursTitle">Эрэлттэй аялал</h2>
+        <p>Аялагчдын хамгийн их үзэж буй хөтөлбөрүүд.</p>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Аяллын төрөл">
+        <button role="tab" id="tab-abroad" aria-selected="true" data-kind="abroad">Гадаад аялал</button>
+        <button role="tab" id="tab-local" aria-selected="false" data-kind="local">Дотоод аялал</button>
+        <button role="tab" id="tab-day" aria-selected="false" data-kind="day">Өдрийн аялал</button>
+      </div>
+    </div>
+    <div class="grid" id="popular"></div>
+  </section>
+
+  <section class="block wrap" id="upcoming">
+    <div class="head">
+      <div>
+        <h2>Ойрын хугацаанд гарах аяллууд</h2>
+        <p>Энэ улирлын онцлох багц аяллууд. Суудал хязгаартай тул эрт захиалаарай.</p>
+      </div>
+    </div>
+    <div class="grid" id="upcomingGrid"></div>
+
+    <div class="voucher">
+      <div class="v-txt">
+        <span class="eyebrow">Бэлгийн карт</span>
+        <h2>Аяллын эрхийн бичиг бэлэглээрэй</h2>
+        <p>Хайртай хүндээ мартагдашгүй бэлэг барь. Тодорхой аяллын нэрээр эсвэл өөрийн сонгосон дүнгээр эрхийн бичиг захиалах боломжтой. Хүчинтэй хугацаа 12 сар.</p>
+        <button class="btn" type="button" id="voucherBtn">Эрхийн бичиг захиалах</button>
+      </div>
+      <div class="ticket" aria-hidden="true">
+        <span class="t-l">Аяллын эрхийн бичиг</span>
+        <span class="t-v">500,000₮</span>
+        <span class="t-n">№ ТА-2026-0418 · 2027.09.26 хүртэл</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="block wrap" id="services">
+    <div class="head">
+      <div>
+        <h2>Нэмэлт үйлчилгээ</h2>
+        <p>Аяллаа бүрэн болгох үйлчилгээнүүдийг онлайнаар захиалаарай.</p>
+      </div>
+    </div>
+    <div class="svc">
+      <article><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9a14.5 14.5 0 0 1 20 0"/><circle cx="12" cy="19.5" r="1.2" fill="currentColor"/></svg></div><h3>Дата сим</h3><p>Гадаадад интернэтээс тасрахгүй. 40 гаруй улсад ажиллана.</p></article>
+      <article><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 20h18M5 20V11l7-6 7 6v9M10 20v-5h4v5"/></svg></div><h3>Байрлах газар</h3><p>Зочид буудал, жуулчны бааз, гэр кемпүүдийг захиалах.</p></article>
+      <article><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="3" width="16" height="14" rx="3"/><path d="M4 11h16M7 17v3M17 17v3"/><circle cx="8" cy="14" r=".8" fill="currentColor"/><circle cx="16" cy="14" r=".8" fill="currentColor"/></svg></div><h3>Автобус түрээс</h3><p>Өдрийн болон олон хоногийн түрээс, 15–45 суудалтай.</p></article>
+      <article><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg></div><h3>Хөтөч</h3><p>Монгол, англи, хятад хэлтэй мэргэжлийн хөтөч.</p></article>
+      <article><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></div><h3>Зурагчин</h3><p>Аяллын дурсамжаа мэргэжлийн зурагчнаар мөнхлөөрэй.</p></article>
+    </div>
+  </section>
+
+  <section class="block wrap" id="reviews">
+    <div class="head"><div><h2>Аялагчдын сэтгэгдэл</h2><p>Бидэнтэй аялсан хүмүүсийн үнэлгээ. Дундаж 4.9 / 5, 1,240 сэтгэгдэл.</p></div></div>
+    <div class="revs">
+      <div class="rev"><span class="stars" aria-label="5 од">★★★★★</span><q>Зохион байгуулалт гайхалтай байсан. Хөтөч маань Хөвсгөлийн түүхийг их сонирхолтой ярьсан.</q><div class="who"><span class="av">Б</span><div><strong>Болормаа</strong><small>Хөвсгөл · 3 хоног</small></div></div></div>
+      <div class="rev"><span class="stars" aria-label="5 од">★★★★★</span><q>Нислэг, буудал, хөтөлбөр бүгд цаг хугацаандаа, төлөвлөгөөний дагуу болсон.</q><div class="who"><span class="av">Т</span><div><strong>Тэмүүлэн</strong><small>Байгал нуур · 6 хоног</small></div></div></div>
+      <div class="rev"><span class="stars" aria-label="5 од">★★★★★</span><q>Гэр бүлээрээ амрахад их тохиромжтой. Хүүхдүүд маань морь унаад маш их баярласан.</q><div class="who"><span class="av">А</span><div><strong>Анударь</strong><small>Тэрэлж · өдрийн</small></div></div></div>
+    </div>
+  </section>
+
+  <section class="block wrap" id="news">
+    <div class="head"><div><h2>Мэдээ мэдээлэл</h2></div><a href="#news" style="font-weight:700;color:var(--sky)">Бүх мэдээ →</a></div>
+    <div class="news">
+      <a href="#news"><time>2026.09.24</time><h3>Өвлийн улирлын виз мэдүүлэх хугацаа эхэллээ</h3><p>12-р сард аялах бол визний материалаа 10-р сарын 20-ноос өмнө бүрдүүлэхийг зөвлөж байна.</p></a>
+      <a href="#news"><time>2026.09.18</time><h3>Байгал нуурын аялалд паспортын хугацааг шалгаарай</h3><p>Хилээр гарах өдрөөс хойш 6 сараас дээш хугацаатай паспорт шаардлагатай.</p></a>
+      <a href="#news"><time>2026.09.10</time><h3>Цагаан сарын аяллын урьдчилсан бүртгэл нээгдлээ</h3><p>2027 оны 2-р сарын аяллуудад 10% хямдралтай урьдчилан бүртгүүлэх боломжтой.</p></a>
+    </div>
+  </section>
+</main>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <div class="logo"><svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#2B5C8A"/><circle cx="21" cy="11" r="4" fill="#FFD08A"/><path d="M1 22 L10 13 L16 19 L21 15 L31 23 A15 15 0 0 1 1 22Z" fill="#4F7A34"/></svg>ТАЛ АЯЛАЛ</div>
+        <p style="margin:0;max-width:40ch">Монгол орон болон дэлхийн өнцөг булан бүрээр тухтай, найдвартай аялуулна.</p>
+      </div>
+      <div>
+        <h4>Цэс</h4>
+        <ul><li><a href="#tours">Аялалууд</a></li><li><a href="#services">Үйлчилгээ</a></li><li><a href="#reviews">Сэтгэгдэл</a></li><li><a href="#news">Мэдээ</a></li></ul>
+      </div>
+      <div>
+        <h4>Холбоо барих</h4>
+        <ul>
+          <li><span class="sel">(+976) 7000-0000</span></li>
+          <li><span class="sel">info@talayalal.mn</span></li>
+          <li>Улаанбаатар, Сүхбаатар дүүрэг, 1-р хороо, Төв цамхаг 8 давхар</li>
+          <li>Даваа–Баасан 09:00–18:00</li>
+        </ul>
+      </div>
+    </div>
+    <div class="copy">© 2026 Тал Аялал ХХК. Бүх эрх хуулиар хамгаалагдсан.</div>
+  </div>
+</footer>
+
+<div class="modal" id="modal" hidden>
+  <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <form id="bookForm" novalidate>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <h3 id="mTitle">Аялал захиалах</h3>
+        <div class="sum" id="mSum"></div>
+        <div class="field"><label for="bName">Овог, нэр</label><input id="bName" autocomplete="name" placeholder="Бат-Эрдэнэ"></div>
+        <div class="row">
+          <div class="field"><label for="bPhone">Утас</label><input id="bPhone" inputmode="tel" placeholder="9911 2233"></div>
+          <div class="field"><label for="bPax">Хүний тоо</label><select id="bPax"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
+        </div>
+        <div class="sum"><span>Нийт дүн</span><strong id="mTotal"></strong></div>
+        <p class="err" id="bErr" hidden>Нэр болон 8 оронтой утасны дугаараа оруулна уу.</p>
+        <div class="actions"><button type="button" class="btn ghost" data-close>Болих</button><button type="submit" class="btn">Хүсэлт илгээх</button></div>
+      </div>
+    </form>
+    <div class="ok" id="bOk" hidden>
+      <span class="big">Хүсэлт бүртгэгдлээ</span>
+      <p style="margin:0">Манай менежер ажлын 1 өдрийн дотор тантай холбогдож төлбөрийн нөхцөлийг танилцуулна. Захиалгын дугаар:</p>
+      <span class="code" id="bCode"></span>
+      <button type="button" class="btn" data-close>Хаах</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Landscape art — each destination gets its own palette
+const SCENES={
+  baikal:{sky:["#8FC3E8","#E7F2F8"],sun:"#FFF4C8",far:"#7F9DB5",near:"#3E6A57",water:"#3C7FB4"},
+  hainan:{sky:["#46B3D8","#CFF1F5"],sun:"#FFF1A8",far:"#6CBFA1",near:"#2F8A6B",water:"#1E9CC0",palm:true},
+  shanghai:{sky:["#F2A65A","#F8D9B0"],sun:"#FFE6B8",far:"#B77D6A",near:"#4B3E55",water:"#6A6F99",city:true},
+  canton:{sky:["#5D7FB8","#C9D6EE"],sun:"#FFF1C4",far:"#8494B8",near:"#394A6E",water:"#4E6A9C",city:true},
+  manzhouli:{sky:["#9CB8D9","#EEF1F4"],sun:"#FFFFFF",far:"#B3B9A6",near:"#8A8A5E",city:true},
+  zhangjiajie:{sky:["#A7C6C0","#EAF1EC"],sun:"#FFFBE6",far:"#8FA99A",near:"#3E5F4B",pillars:true},
+  khuvsgul:{sky:["#6FA9DD","#DDEEFA"],sun:"#FFF6D0",far:"#6E8FA8",near:"#2F5D3A",water:"#2F6FA8",pines:true},
+  gobi:{sky:["#F0B37A","#FBE3C4"],sun:"#FFF1D6",far:"#D99A5E",near:"#B97339",dunes:true},
+  terelj:{sky:["#7DB6E3","#E8F3FB"],sun:"#FFF6D0",far:"#8FA37E",near:"#5E7D3E",ger:true},
+  altai:{sky:["#8DB2D8","#EEF3F8"],sun:"#FFFFFF",far:"#C9D6E2",near:"#5B6F58",snow:true},
+  khustai:{sky:["#E9B872","#F7E6C4"],sun:"#FFF1D0",far:"#B6A26B",near:"#7E8A45",ger:true},
+  seoul:{sky:["#C995C4","#F3DDEE"],sun:"#FFF1F4",far:"#9C88A8",near:"#4A4263",city:true}
+};
+function art(key,id){
+  const s=SCENES[key]; const g="g"+id;
+  let extra="";
+  if(s.city){for(let i=0;i<14;i++){const w=22+((i*37)%18),h=40+((i*53)%90),x=i*30;extra+=`<rect x="${x}" y="${250-h}" width="${w}" height="${h}" fill="${s.near}" opacity=".92"/>`;}}
+  if(s.palm){extra+=`<path d="M320 250 C318 200 322 170 330 140" stroke="#3A4A2A" stroke-width="5" fill="none"/><path d="M330 140 q-30 -5 -45 15 M330 140 q30 -8 45 10 M330 140 q-12 -25 -35 -28 M330 140 q18 -24 38 -22" stroke="#2F6B3E" stroke-width="6" fill="none" stroke-linecap="round"/>`;}
+  if(s.pillars){[40,95,140,250,300,345].forEach((x,i)=>{const h=90+((i*41)%70);extra+=`<path d="M${x} 260 L${x+4} ${260-h} Q${x+14} ${250-h} ${x+26} ${258-h} L${x+30} 260Z" fill="${s.near}"/>`;});}
+  if(s.pines){for(let i=0;i<16;i++){const x=i*26+((i*7)%10),h=30+((i*13)%22);extra+=`<path d="M${x} 252 L${x+9} ${252-h} L${x+18} 252Z" fill="#1F4A2C"/>`;}}
+  if(s.ger){extra+=`<g transform="translate(250 205)"><path d="M0 30 V14 Q24 -6 48 14 V30Z" fill="#F7F4EC"/><path d="M0 14 Q24 -6 48 14" stroke="#B5462F" stroke-width="3" fill="none"/><rect x="19" y="17" width="10" height="13" fill="#D9892B"/></g>`;}
+  const ground = s.dunes
+    ? `<path d="M0 190 Q100 150 200 185 T400 175 V250 H0Z" fill="${s.far}"/><path d="M0 225 Q120 185 230 222 T400 210 V250 H0Z" fill="${s.near}"/>`
+    : `<path d="M0 180 L60 130 L110 160 L170 105 L240 165 L300 125 L360 158 L400 140 V250 H0Z" fill="${s.far}"/>${s.snow?`<path d="M160 113 L170 105 L182 118 L176 116 L170 122 L164 116Z M292 132 L300 125 L310 135 L303 133 L298 138Z" fill="#fff"/>`:""}<path d="M0 215 Q90 185 180 208 T400 200 V250 H0Z" fill="${s.near}"/>`;
+  const water = s.water?`<rect x="0" y="225" width="400" height="25" fill="${s.water}"/><path d="M40 235 h40 M150 241 h60 M280 234 h50" stroke="#fff" stroke-opacity=".35" stroke-width="2"/>`:"";
+  return `<svg class="art" viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs><linearGradient id="${g}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s.sky[0]}"/><stop offset="1" stop-color="${s.sky[1]}"/></linearGradient></defs>
+    <rect width="400" height="250" fill="url(#${g})"/><circle cx="310" cy="70" r="26" fill="${s.sun}" opacity=".95"/>
+    ${ground}${water}${extra}</svg>`;
+}
+
+const TOURS=[
+  {id:1,kind:"abroad",scene:"baikal",country:"ОХУ",title:"Байгал нуур – Эрхүү хотын аялал",from:"2026.09.30",to:"10.05",days:6,seats:2,price:900000,badge:"ОНЦЛОХ"},
+  {id:2,kind:"abroad",scene:"shanghai",country:"БНХАУ",title:"Шанхай хотын шууд нислэгтэй аялал (Диснейлэндтэй)",from:"2026.10.29",to:"11.03",days:6,seats:4,price:3590000,badge:"ЭРЭЛТТЭЙ",hot:true},
+  {id:3,kind:"abroad",scene:"canton",country:"БНХАУ",title:"Canton Fair 2026: Гуанжоу – Макао",from:"2026.10.13",to:"10.21",days:9,seats:2,price:2750000,badge:"ОНЦЛОХ"},
+  {id:4,kind:"abroad",scene:"seoul",country:"БНСУ",title:"Сөүл – Жэжү намрын аялал",from:"2026.11.06",to:"11.12",days:7,seats:6,price:2890000},
+  {id:5,kind:"abroad",scene:"manzhouli",country:"БНХАУ",title:"Манжуур хотын шууд нислэгтэй аялал · 4 шөнө 5 өдөр",from:"2026.09.26",to:"09.30",days:5,seats:5,price:1080000},
+  {id:6,kind:"abroad",scene:"hainan",country:"БНХАУ",title:"Хайнан арлын аялал",from:"2026.09.29",to:"10.05",days:8,seats:4,price:2590000},
+  {id:7,kind:"abroad",scene:"hainan",country:"БНХАУ · Сингапур",title:"Хайнан – Сингапур хосолсон аялал",from:"2026.09.29",to:"10.06",days:7,seats:4,price:5900000,badge:"ОНЦЛОХ"},
+  {id:8,kind:"abroad",scene:"zhangjiajie",country:"БНХАУ",title:"Чунчин – Жанжиажэ шууд нислэгтэй аялал",from:"2026.10.18",to:"10.24",days:7,seats:8,price:3150000},
+  {id:9,kind:"local",scene:"khuvsgul",country:"Хөвсгөл",title:"Хөвсгөл нуур – Хатгал тосгон",from:"2026.10.02",to:"10.04",days:3,seats:10,price:690000,badge:"ЭРЭЛТТЭЙ",hot:true},
+  {id:10,kind:"local",scene:"gobi",country:"Өмнөговь",title:"Хонгорын элс – Ёлын ам – Баянзаг",from:"2026.10.08",to:"10.13",days:6,seats:7,price:1450000,badge:"ОНЦЛОХ"},
+  {id:11,kind:"local",scene:"altai",country:"Баян-Өлгий",title:"Алтай Таван Богд – Бүргэдийн баяр",from:"2026.10.03",to:"10.09",days:7,seats:3,price:2350000},
+  {id:12,kind:"day",scene:"terelj",country:"Төв аймаг",title:"Тэрэлж – Мэлхий хад – Арьяабал хийд",from:"2026.09.27",to:"09.27",days:1,seats:12,price:120000,badge:"ЭРЭЛТТЭЙ",hot:true},
+  {id:13,kind:"day",scene:"khustai",country:"Төв аймаг",title:"Хустайн нуруу – тахийн ажиглалт",from:"2026.10.04",to:"10.04",days:1,seats:14,price:145000},
+  {id:14,kind:"day",scene:"terelj",country:"Төв аймаг",title:"Чингисийн морьт хөшөө – Горхи-Тэрэлж",from:"2026.10.11",to:"10.11",days:1,seats:9,price:135000}
+];
+const UPCOMING=[5,6,7,1,9,12,8,10];
+const SLIDES=[
+  {id:7,eyebrow:"2026 оны 9-р сарын 29-өөс",title:"Хайнан – Сингапур хосолсон аялал",route:"УБ → Хайкоу → Сингапур → Саняа → УБ"},
+  {id:1,eyebrow:"Үлдэгдэл 2 суудал",title:"Байгал нуур – Эрхүү – Листвянка",route:"УБ → Эрхүү → Листвянка → УБ"},
+  {id:10,eyebrow:"Дотоод аялал · 6 өдөр",title:"Говийн гурван гайхамшиг",route:"УБ → Даланзадгад → Хонгорын элс → УБ"},
+  {id:8,eyebrow:"Шууд нислэгтэй",title:"Жанжиажэ: Тэнгэрийн хаалга",route:"УБ → Чунчин → Жанжиажэ → УБ"}
+];
+const byId=Object.fromEntries(TOURS.map(t=>[t.id,t]));
+const fmt=n=>n.toLocaleString("en-US")+"₮";
+let uid=0;
+
+function card(t){
+  const days=t.days===1?"1 өдөр":`${t.days} өдөр`;
+  const date=t.days===1?t.from:`${t.from} – ${t.to}`;
+  return `<article class="card">
+    <div class="pic">${art(t.scene,"c"+(uid++))}${t.badge?`<span class="badge${t.hot?" hot":""}">${t.badge}</span>`:""}<span class="country">${t.country}</span></div>
+    <div class="body">
+      <h3>${t.title}</h3>
+      <div class="meta"><span>📅 ${date}</span><span>⏱ ${days}</span><span>👤 ${t.seats} суудал</span></div>
+      <div class="foot"><div class="price">${fmt(t.price)}<small>1 хүний үнэ</small></div><button class="btn" data-book="${t.id}" type="button">Захиалах</button></div>
+    </div></article>`;
+}
+
+// Hero slider
+const slidesEl=document.getElementById("slides"),dotsEl=document.getElementById("dots");
+slidesEl.innerHTML=SLIDES.map((s,i)=>`<div class="slide${i===0?" on":""}">${art(byId[s.id].scene,"h"+i)}<div class="shade"></div>
+  <div class="wrap txt"><span class="eyebrow">${s.eyebrow}</span><h1>${s.title}</h1><span class="route">${s.route}</span>
+  <button class="btn" data-book="${s.id}" type="button">Хөтөлбөр үзэх · ${fmt(byId[s.id].price)}</button></div></div>`).join("");
+dotsEl.innerHTML=SLIDES.map((s,i)=>`<button role="tab" aria-label="${s.title}" aria-selected="${i===0}" class="${i===0?"on":""}" data-i="${i}"></button>`).join("");
+let cur=0,timer;
+function show(i){cur=i;[...slidesEl.children].forEach((el,j)=>el.classList.toggle("on",j===i));[...dotsEl.children].forEach((el,j)=>{el.classList.toggle("on",j===i);el.setAttribute("aria-selected",j===i)});}
+function auto(){clearInterval(timer);if(!matchMedia("(prefers-reduced-motion: reduce)").matches)timer=setInterval(()=>show((cur+1)%SLIDES.length),6000);}
+dotsEl.addEventListener("click",e=>{const b=e.target.closest("button");if(b){show(+b.dataset.i);auto();}});
+auto();
+
+// Popular tabs + search
+const pop=document.getElementById("popular");
+let kind="abroad",filter=null;
+const KIND_TITLE={abroad:"Эрэлттэй гадаад аялал",local:"Эрэлттэй дотоод аялал",day:"Өдрийн аялал"};
+function renderPopular(){
+  let list;
+  if(filter){
+    list=TOURS.filter(t=>{
+      const hay=(t.title+" "+t.country+" "+t.scene).toLowerCase();
+      if(filter.q&&!hay.includes(filter.q))return false;
+      if(filter.month&&+t.from.split(".")[1]!==+filter.month)return false;
+      if(filter.budget&&t.price>+filter.budget)return false;
+      return true;});
+    document.getElementById("toursTitle").textContent=`Хайлтын үр дүн: ${list.length} аялал`;
+  }else{
+    list=TOURS.filter(t=>t.kind===kind).slice(0,4);
+    document.getElementById("toursTitle").textContent=KIND_TITLE[kind];
+  }
+  pop.innerHTML=list.length?list.map(card).join(""):`<div class="empty">Тохирох аялал олдсонгүй. Өөр сар эсвэл төсөв сонгоод дахин хайна уу.</div>`;
+}
+document.querySelector(".tabs").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  kind=b.dataset.kind;filter=null;
+  document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));
+  renderPopular();
+});
+document.getElementById("searchForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const q=document.getElementById("q").value.trim().toLowerCase(),month=document.getElementById("month").value,budget=document.getElementById("budget").value;
+  filter=(q||month||budget)?{q,month,budget}:null;
+  renderPopular();
+  document.getElementById("tours").scrollIntoView({behavior:"smooth"});
+});
+renderPopular();
+document.getElementById("upcomingGrid").innerHTML=UPCOMING.map(id=>card(byId[id])).join("");
+
+// Booking modal
+const modal=document.getElementById("modal"),form=document.getElementById("bookForm"),ok=document.getElementById("bOk"),pax=document.getElementById("bPax");
+let active=null,lastFocus=null;
+function total(){document.getElementById("mTotal").textContent=active?fmt(active.price*+pax.value):"";}
+function openBook(t,voucher){
+  active=t;lastFocus=document.activeElement;
+  form.hidden=false;ok.hidden=true;document.getElementById("bErr").hidden=true;
+  document.getElementById("mTitle").textContent=voucher?"Эрхийн бичиг захиалах":"Аялал захиалах";
+  document.getElementById("mSum").innerHTML=voucher?`<span>Бэлгийн эрхийн бичиг</span><span>500,000₮ / ширхэг</span>`:`<span>${t.title}</span><span>${t.days===1?t.from:t.from+" – "+t.to}</span>`;
+  total();modal.hidden=false;document.getElementById("bName").focus();
+}
+function close(){modal.hidden=true;lastFocus&&lastFocus.focus();}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-book]");if(b){openBook(byId[b.dataset.book]);return;}
+  if(e.target.closest("[data-close]")||e.target===modal)close();
+});
+document.getElementById("voucherBtn").addEventListener("click",()=>openBook({price:500000,title:"Эрхийн бичиг"},true));
+document.getElementById("loginBtn").addEventListener("click",()=>document.getElementById("contact").scrollIntoView({behavior:"smooth"}));
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!modal.hidden)close();});
+pax.addEventListener("change",total);
+form.addEventListener("submit",e=>{
+  e.preventDefault();
+  const name=document.getElementById("bName").value.trim(),phone=document.getElementById("bPhone").value.replace(/\D/g,"");
+  if(!name||phone.length!==8){document.getElementById("bErr").hidden=false;return;}
+  document.getElementById("bCode").textContent="ТА-"+Math.floor(100000+Math.random()*900000);
+  form.hidden=true;ok.hidden=false;
+});
+</script>
+</body>
+</html>
