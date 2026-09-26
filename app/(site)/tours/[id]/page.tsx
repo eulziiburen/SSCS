@@ -111,6 +111,9 @@ export default async function TourPage({ params }: PageProps<"/tours/[id]">) {
           <BookButton tour={tour} className="btn lg full">
             {t.card.book}
           </BookButton>
+          <Link className="btn ghost full" href={`/calculator?tour=${tour.id}`}>
+            {t.tour.calculate}
+          </Link>
           <a className="btn ghost full" href="tel:+97670000000">
             <PhoneIcon /> {t.tour.call}
           </a>

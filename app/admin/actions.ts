@@ -4,7 +4,8 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db, ensureDb } from "@/db/client";
-import { bookings, news, tours } from "@/db/schema";
+import { bookings, news, settings, tours } from "@/db/schema";
+import { ADDONS, CURRENCIES, mergeCalc } from "@/lib/calc";
 import { checkCredentials, createSession, destroySession, isAuthenticated } from "@/lib/auth";
 import { BOOKING_STATUS, SCENE_KEYS, type BookingStatus } from "@/lib/data";
 
@@ -173,4 +174,24 @@ export async function deleteNews(fd: FormData) {
   await db.delete(news).where(eq(news.id, Number(fd.get("id"))));
   refreshSite();
   redirect("/admin/news");
+}
+
+/* ---------- calculator settings ---------- */
+
+export async function saveCalcSettings(fd: FormData) {
+  await requireAuth();
+  const n = (k: string) => Number(str(fd, k).replace(/[^\d.]/g, ""));
+  const value = mergeCalc({
+    childPercent: Math.min(100, n("childPercent")),
+    singlePerNight: n("singlePerNight"),
+    addons: Object.fromEntries(ADDONS.map((a) => [a, n(`addon_${a}`)])),
+    rates: Object.fromEntries(CURRENCIES.map((c) => [c, n(`rate_${c}`)])),
+    ratesDate: str(fd, "ratesDate"),
+  });
+  await db
+    .insert(settings)
+    .values({ key: "calc", value: JSON.stringify(value) })
+    .onConflictDoUpdate({ target: settings.key, set: { value: JSON.stringify(value) } });
+  refreshSite();
+  redirect("/admin/settings?saved=1");
 }

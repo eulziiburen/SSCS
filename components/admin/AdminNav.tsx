@@ -8,6 +8,7 @@ const ITEMS = [
   { href: "/admin/bookings", label: "Захиалгууд" },
   { href: "/admin/tours", label: "Аялалууд" },
   { href: "/admin/news", label: "Мэдээ" },
+  { href: "/admin/settings", label: "Тооцоолуур" },
 ];
 
 export function AdminNav({ newCount }: { newCount: number }) {

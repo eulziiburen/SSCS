@@ -36,6 +36,7 @@ export const bookings = sqliteTable("bookings", {
   total: integer("total").notNull(),
   status: text("status", { enum: ["new", "contacted", "confirmed", "cancelled"] }).notNull().default("new"),
   note: text("note"),
+  details: text("details"), // calculator breakdown, e.g. "Том 2, хүүхэд 1 · Ганц өрөө 1"
   createdAt: text("created_at").notNull(),
 });
 
@@ -47,6 +48,11 @@ export const news = sqliteTable("news", {
   titleEn: text("title_en"),
   textEn: text("text_en"),
   published: integer("published", { mode: "boolean" }).notNull().default(true),
+});
+
+export const settings = sqliteTable("settings", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(), // JSON
 });
 
 export type TourRow = typeof tours.$inferSelect;

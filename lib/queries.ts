@@ -1,6 +1,7 @@
 import { asc, desc, eq } from "drizzle-orm";
 import { db, ensureDb } from "@/db/client";
-import { bookings, news, tours, type TourRow } from "@/db/schema";
+import { bookings, news, settings, tours, type TourRow } from "@/db/schema";
+import { mergeCalc, type CalcSettings } from "./calc";
 import { daysBetween, SCENE_KEYS, type NewsItem, type SceneKey, type Tour } from "./data";
 
 function parseList(json: string | null): string[] {
@@ -48,4 +49,14 @@ export async function getNews({ includeHidden = false } = {}): Promise<NewsItem[
 export async function getBookings() {
   await ensureDb();
   return db.select().from(bookings).orderBy(desc(bookings.createdAt));
+}
+
+export async function getCalcSettings(): Promise<CalcSettings> {
+  await ensureDb();
+  const [row] = await db.select().from(settings).where(eq(settings.key, "calc"));
+  try {
+    return mergeCalc(row ? JSON.parse(row.value) : null);
+  } catch {
+    return mergeCalc(null);
+  }
 }

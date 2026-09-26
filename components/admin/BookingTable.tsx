@@ -41,9 +41,7 @@ export function BookingTable({ bookings, compact = false }: { bookings: BookingR
               </td>
               <td>
                 {b.tourId ? <Link href={`/admin/tours/${b.tourId}`}>{b.tourTitle}</Link> : b.tourTitle}
-                <small>
-                  {b.pax} × {fmt(b.unitPrice)}
-                </small>
+                <small>{b.details ? `Тооцоолуур: ${b.details}` : `${b.pax} × ${fmt(b.unitPrice)}`}</small>
               </td>
               <td className="num mono">{fmt(b.total)}</td>
               <td>

@@ -48,6 +48,10 @@ CREATE TABLE IF NOT EXISTS bookings (
   note TEXT,
   created_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS news (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   date TEXT NOT NULL,
@@ -63,6 +67,7 @@ const TOUR_COLS = ["kind", "scene", "country", "title", "start_date", "end_date"
 const ADDED_COLUMNS: Record<string, string[]> = {
   tours: ["title_en", "country_en", "route_en", "hero_eyebrow_en"],
   news: ["title_en", "text_en"],
+  bookings: ["details"],
 };
 
 async function migrate() {

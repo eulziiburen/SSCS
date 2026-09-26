@@ -85,7 +85,7 @@ export function Header() {
 
   const nav = [
     { href: "/tours", label: t.nav.tours },
-    { href: "/#upcoming", label: t.nav.upcoming },
+    { href: "/calculator", label: t.nav.calculator },
     { href: "/#services", label: t.nav.services },
     { href: "/#news", label: t.nav.news },
     { href: "/#contact", label: t.nav.contact },
@@ -108,7 +108,7 @@ export function Header() {
         </Link>
         <nav className={`nav${open ? " open" : ""}`} id="main-nav" aria-label={t.nav.main}>
           {nav.map((n) => (
-            <Link key={n.href} href={n.href} aria-current={n.href === "/tours" && pathname.startsWith("/tours") ? "page" : undefined} onClick={() => setOpen(false)}>
+            <Link key={n.href} href={n.href} aria-current={!n.href.includes("#") && pathname.startsWith(n.href) ? "page" : undefined} onClick={() => setOpen(false)}>
               {n.label}
             </Link>
           ))}
