@@ -4,7 +4,7 @@ import { badgeLabel } from "@/lib/i18n";
 import { getI18n } from "@/lib/locale";
 import { BookButton } from "./Booking";
 import { CalendarIcon, ClockIcon, SeatIcon } from "./Icons";
-import { SceneArt } from "./SceneArt";
+import { TourVisual } from "./TourVisual";
 
 // Expects an already-localized tour (see localizeTour)
 export async function TourCard({ tour, idPrefix = "c" }: { tour: Tour; idPrefix?: string }) {
@@ -13,7 +13,7 @@ export async function TourCard({ tour, idPrefix = "c" }: { tour: Tour; idPrefix?
   return (
     <article className="card">
       <div className="pic">
-        <SceneArt scene={tour.scene} id={`${idPrefix}${tour.id}`} />
+        <TourVisual imageId={tour.imageId} scene={tour.scene} id={`${idPrefix}${tour.id}`} />
         {tour.badge && <span className={`badge${tour.hot ? " hot" : ""}`}>{badgeLabel(tour.badge, locale)}</span>}
         <span className="country">{tour.country}</span>
       </div>

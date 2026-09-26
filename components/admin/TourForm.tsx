@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { deleteTour, saveTour } from "@/app/admin/actions";
 import { KIND_LABEL, SCENE_KEYS, SCENE_LABEL, type Tour } from "@/lib/data";
+import { imageUrl } from "../TourVisual";
 import { ConfirmButton, SubmitButton } from "./Controls";
+import { ImageField } from "./ImageField";
 
 const on = (b: boolean | undefined) => (b ? "on" : "");
 
@@ -66,7 +68,7 @@ export function TourForm({ tour: t }: { tour?: Tour }) {
               <input id="country" name="country" defaultValue={d.country} required placeholder="БНХАУ" />
             </div>
             <div className="field">
-              <label htmlFor="scene">Зураг</label>
+              <label htmlFor="scene">Дүрслэл (зураггүй үед)</label>
               <select id="scene" name="scene" defaultValue={d.scene}>
                 {SCENE_KEYS.map((k) => (
                   <option key={k} value={k}>
@@ -98,6 +100,11 @@ export function TourForm({ tour: t }: { tour?: Tour }) {
             <label htmlFor="route">Маршрут — мөр бүрт нэг цэг</label>
             <textarea id="route" name="route" rows={5} defaultValue={d.route} required />
           </div>
+        </section>
+
+        <section className="a-card">
+          <h2>Зураг</h2>
+          <ImageField name="image" label="Нүүрний slider, карт, дэлгэрэнгүй хуудсанд харагдана" currentUrl={t?.imageId ? imageUrl(t.imageId) : null} />
         </section>
 
         <section className="a-card">

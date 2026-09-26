@@ -5,11 +5,11 @@ import { useEffect, useRef, useState } from "react";
 import { fmt, type SceneKey } from "@/lib/data";
 import { ArrowIcon, ChevronIcon } from "./Icons";
 import { useI18n } from "./LocaleProvider";
-import { SceneArt } from "./SceneArt";
+import { TourVisual } from "./TourVisual";
 
 const INTERVAL = 6000;
 
-export type Slide = { id: number; eyebrow: string; title: string; scene: SceneKey; route: string[]; price: number };
+export type Slide = { id: number; eyebrow: string; title: string; scene: SceneKey; imageId: number | null; route: string[]; price: number };
 
 export function HeroSlider({ slides }: { slides: Slide[] }) {
   const { t } = useI18n();
@@ -46,7 +46,7 @@ export function HeroSlider({ slides }: { slides: Slide[] }) {
         {slides.map((s, i) => {
           return (
             <div key={s.id} className={`slide${i === cur ? " on" : ""}`} aria-hidden={i !== cur} aria-roledescription="slide" aria-label={`${i + 1} / ${n}`}>
-              <SceneArt scene={s.scene} id={`h${i}`} />
+              <TourVisual imageId={s.imageId} scene={s.scene} id={`h${i}`} priority={i === 0} />
               <div className="shade" />
               <div className="wrap txt">
                 <span className="eyebrow">{s.eyebrow}</span>

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BookButton } from "@/components/Booking";
 import { CalendarIcon, CheckIcon, ClockIcon, PhoneIcon, PinIcon, SeatIcon, XIcon } from "@/components/Icons";
-import { SceneArt } from "@/components/SceneArt";
+import { TourVisual } from "@/components/TourVisual";
 import { TourCard } from "@/components/TourCard";
 import { dateRange, fmt, localizeTour } from "@/lib/data";
 import { badgeLabel } from "@/lib/i18n";
@@ -36,7 +36,7 @@ export default async function TourPage({ params }: PageProps<"/tours/[id]">) {
   return (
     <>
       <div className="detail-hero">
-        <SceneArt scene={tour.scene} id="d" />
+        <TourVisual imageId={tour.imageId} scene={tour.scene} id="d" priority />
         <div className="shade" />
         <div className="wrap txt">
           <nav className="crumbs light" aria-label={t.list.breadcrumb}>

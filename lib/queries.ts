@@ -2,6 +2,7 @@ import { asc, desc, eq } from "drizzle-orm";
 import { db, ensureDb } from "@/db/client";
 import { bookings, news, settings, tours, type TourRow } from "@/db/schema";
 import { mergeCalc, type CalcSettings } from "./calc";
+import { mergeStats, type Stat } from "./stats";
 import { daysBetween, SCENE_KEYS, type NewsItem, type SceneKey, type Tour } from "./data";
 
 function parseList(json: string | null): string[] {
@@ -58,5 +59,15 @@ export async function getCalcSettings(): Promise<CalcSettings> {
     return mergeCalc(row ? JSON.parse(row.value) : null);
   } catch {
     return mergeCalc(null);
+  }
+}
+
+export async function getHomeStats(): Promise<Stat[]> {
+  await ensureDb();
+  const [row] = await db.select().from(settings).where(eq(settings.key, "stats"));
+  try {
+    return mergeStats(row ? JSON.parse(row.value) : null);
+  } catch {
+    return mergeStats(null);
   }
 }

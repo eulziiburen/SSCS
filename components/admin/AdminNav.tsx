@@ -8,6 +8,7 @@ const ITEMS = [
   { href: "/admin/bookings", label: "Захиалгууд" },
   { href: "/admin/tours", label: "Аялалууд" },
   { href: "/admin/news", label: "Мэдээ" },
+  { href: "/admin/home", label: "Нүүр хуудас" },
   { href: "/admin/settings", label: "Тооцоолуур" },
 ];
 

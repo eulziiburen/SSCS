@@ -47,7 +47,6 @@ const mn = {
   },
   stats: {
     label: "Бидний тухай тоогоор",
-    items: ["жил туршлага", "аялагч", "дундаж үнэлгээ", "аяллын үеийн дэмжлэг"],
   },
   home: {
     popular: "Эрэлттэй аялал",
@@ -263,7 +262,6 @@ const en: Dictionary = {
   },
   stats: {
     label: "Soft Travel in numbers",
-    items: ["years of experience", "travelers", "average rating", "support while you travel"],
   },
   home: {
     popular: "Popular tours",

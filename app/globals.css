@@ -143,7 +143,7 @@ button { font: inherit; cursor: pointer; color: inherit; }
 @media (max-width: 420px) { .search-form { grid-template-columns: 1fr; } }
 
 /* stats */
-.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding-top: 36px; }
+.stats { display: grid; grid-template-columns: repeat(var(--n, 4), 1fr); gap: 16px; padding-top: 36px; }
 .stats div { display: flex; flex-direction: column; gap: 2px; padding-left: 14px; border-left: 3px solid var(--saffron); }
 .stats strong { font-family: var(--display); font-size: clamp(20px, 2.4vw, 26px); font-variant-numeric: tabular-nums; }
 .stats span { color: var(--muted); font-size: 13.5px; }
@@ -491,3 +491,21 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .conv-rates li { display: flex; flex-direction: column; padding: 10px 12px; border-radius: 10px; background: var(--chip); font-family: var(--mono); font-size: 13px; }
 .conv-rates li span:first-child { color: var(--muted); }
 @media (max-width: 640px) { .conv-row { grid-template-columns: 1fr auto; } .conv-row .field:last-child { grid-column: 1 / -1; } .conv-rates { grid-template-columns: repeat(3, 1fr); } }
+
+/* uploaded tour photos fill the same box as the illustrated scenes */
+img.art.photo { object-fit: cover; }
+
+.a-image { gap: 10px; }
+.a-image-box { width: min(420px, 100%); aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: var(--chip); display: grid; place-items: center; border: 1px dashed var(--line); }
+.a-image-box img { width: 100%; height: 100%; object-fit: cover; }
+.a-image-empty { color: var(--muted); font-size: 13px; padding: 12px; text-align: center; }
+.a-image-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.a-image-actions label.a-btn { cursor: pointer; }
+.a-stats-edit { display: grid; grid-template-columns: 160px 1fr 1fr; gap: 8px 12px; }
+.a-stats-row { display: contents; }
+.a-stats-edit input { width: 100%; font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+@media (max-width: 640px) {
+  .a-stats-edit { grid-template-columns: 1fr; }
+  .a-stats-edit > .label { display: none; }
+  .a-stats-row { display: grid; gap: 6px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+}

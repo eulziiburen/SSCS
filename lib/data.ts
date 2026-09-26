@@ -42,6 +42,7 @@ export type Tour = {
   countryEn: string | null;
   routeEn: string[];
   heroEyebrowEn: string | null;
+  imageId: number | null;
 };
 
 export type NewsItem = { id: number; date: string; title: string; text: string; titleEn: string | null; textEn: string | null; published: boolean };

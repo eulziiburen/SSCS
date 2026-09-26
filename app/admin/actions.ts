@@ -4,8 +4,9 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db, ensureDb } from "@/db/client";
-import { bookings, news, settings, tours } from "@/db/schema";
+import { bookings, images, news, settings, tours } from "@/db/schema";
 import { ADDONS, CURRENCIES, mergeCalc } from "@/lib/calc";
+import { MAX_STATS, mergeStats } from "@/lib/stats";
 import { checkCredentials, createSession, destroySession, isAuthenticated } from "@/lib/auth";
 import { BOOKING_STATUS, SCENE_KEYS, type BookingStatus } from "@/lib/data";
 
@@ -93,18 +94,43 @@ export async function saveTour(_prev: TourFormState, fd: FormData): Promise<Tour
   if (route.length < 2) return fail("Маршрутад дор хаяж 2 цэг оруулна уу (мөр бүрт нэг).");
   if (routeEn.length && routeEn.length !== route.length) return fail(`Англи маршрут монголтой ижил тооны цэгтэй байх ёстой (${route.length}).`);
 
-  if (id) {
-    await db.update(tours).set(data).where(eq(tours.id, id));
-  } else {
-    await db.insert(tours).values(data);
+  const upload = fd.get("image");
+  const hasUpload = upload instanceof File && upload.size > 0;
+  if (hasUpload && !IMAGE_TYPES.includes(upload.type)) return fail("Зөвхөн JPG, PNG, WebP зураг оруулна уу.");
+  if (hasUpload && upload.size > MAX_IMAGE_BYTES) return fail("Зураг хэт том байна (3.5MB-аас бага байх ёстой).");
+
+  const [existing] = id ? await db.select({ imageId: tours.imageId }).from(tours).where(eq(tours.id, id)) : [];
+  let imageId = existing?.imageId ?? null;
+  if (hasUpload) {
+    const [img] = await db
+      .insert(images)
+      .values({ mime: upload.type, data: Buffer.from(await upload.arrayBuffer()), createdAt: new Date().toISOString() })
+      .returning({ id: images.id });
+    imageId = img.id;
+  } else if (fd.get("imageRemove") === "1") {
+    imageId = null;
   }
+
+  if (id) {
+    await db.update(tours).set({ ...data, imageId }).where(eq(tours.id, id));
+  } else {
+    await db.insert(tours).values({ ...data, imageId });
+  }
+  // The old photo is no longer referenced once replaced or removed
+  if (existing?.imageId && existing.imageId !== imageId) await db.delete(images).where(eq(images.id, existing.imageId));
   refreshSite();
   redirect("/admin/tours?saved=1");
 }
 
+const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_IMAGE_BYTES = 3.5 * 1024 * 1024;
+
 export async function deleteTour(fd: FormData) {
   await requireAuth();
-  await db.delete(tours).where(eq(tours.id, Number(fd.get("id"))));
+  const id = Number(fd.get("id"));
+  const [tour] = await db.select({ imageId: tours.imageId }).from(tours).where(eq(tours.id, id));
+  await db.delete(tours).where(eq(tours.id, id));
+  if (tour?.imageId) await db.delete(images).where(eq(images.id, tour.imageId));
   refreshSite();
   redirect("/admin/tours");
 }
@@ -194,4 +220,15 @@ export async function saveCalcSettings(fd: FormData) {
     .onConflictDoUpdate({ target: settings.key, set: { value: JSON.stringify(value) } });
   refreshSite();
   redirect("/admin/settings?saved=1");
+}
+
+/* ---------- home page numbers ---------- */
+
+export async function saveStats(fd: FormData) {
+  await requireAuth();
+  const rows = Array.from({ length: MAX_STATS }, (_, i) => ({ value: str(fd, `value${i}`), mn: str(fd, `mn${i}`), en: str(fd, `en${i}`) }));
+  const value = JSON.stringify(mergeStats(rows));
+  await db.insert(settings).values({ key: "stats", value }).onConflictDoUpdate({ target: settings.key, set: { value } });
+  refreshSite();
+  redirect("/admin/home?saved=1");
 }

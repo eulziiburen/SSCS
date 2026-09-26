@@ -7,7 +7,7 @@ import { Tabs } from "@/components/Tabs";
 import { TourCard } from "@/components/TourCard";
 import { dotDate, fmt, localizeNews, localizeTour, VOUCHER_PRICE, type Kind } from "@/lib/data";
 import { getI18n } from "@/lib/locale";
-import { getNews, getTours } from "@/lib/queries";
+import { getHomeStats, getNews, getTours } from "@/lib/queries";
 
 const KINDS: Kind[] = ["abroad", "local", "day"];
 
@@ -19,10 +19,8 @@ const SERVICE_ICONS = [
   <path key="photo" d="M4 8h3l2-3h6l2 3h3v11H4zM12 9.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7z" />,
 ];
 
-const STAT_VALUES = ["12+", "18,000+", "4.9 / 5", "24/7"];
-
 export default async function Home() {
-  const [{ locale, t }, rawTours, rawNews] = await Promise.all([getI18n(), getTours(), getNews()]);
+  const [{ locale, t }, rawTours, rawNews, stats] = await Promise.all([getI18n(), getTours(), getNews(), getHomeStats()]);
   const tours = rawTours.map((x) => localizeTour(x, locale));
   const news = rawNews.map((x) => localizeNews(x, locale));
   const upcoming = tours.filter((x) => x.upcoming);
@@ -33,6 +31,7 @@ export default async function Home() {
     eyebrow: x.heroEyebrow || t.hero.eyebrow(t.kind[x.kind], x.days),
     title: x.title,
     scene: x.scene,
+    imageId: x.imageId,
     route: x.route,
     price: x.price,
   }));
@@ -45,14 +44,16 @@ export default async function Home() {
         <SearchForm />
       </div>
 
-      <section className="wrap stats" aria-label={t.stats.label}>
-        {STAT_VALUES.map((v, i) => (
-          <div key={v}>
-            <strong>{v}</strong>
-            <span>{t.stats.items[i]}</span>
-          </div>
-        ))}
-      </section>
+      {stats.length > 0 && (
+        <section className="wrap stats" aria-label={t.stats.label} style={{ "--n": stats.length } as React.CSSProperties}>
+          {stats.map((s, i) => (
+            <div key={i}>
+              <strong>{s.value}</strong>
+              <span>{(locale === "en" ? s.en : s.mn) || s.mn || s.en}</span>
+            </div>
+          ))}
+        </section>
+      )}
 
       <section className="block wrap" id="tours" aria-labelledby="tours-h">
         <div className="head">

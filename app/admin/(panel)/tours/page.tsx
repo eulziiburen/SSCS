@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { toggleTour } from "@/app/admin/actions";
-import { SceneArt } from "@/components/SceneArt";
+import { TourVisual } from "@/components/TourVisual";
 import { dateRange, fmt, KIND_LABEL } from "@/lib/data";
 import { getTours } from "@/lib/queries";
 
@@ -56,7 +56,7 @@ export default async function ToursAdmin({ searchParams }: PageProps<"/admin/tou
                   <td>
                     <div className="a-tour">
                       <span className="a-thumb">
-                        <SceneArt scene={t.scene} id={`a${t.id}`} />
+                        <TourVisual imageId={t.imageId} scene={t.scene} id={`a${t.id}`} />
                       </span>
                       <div>
                         <Link href={`/admin/tours/${t.id}`}>

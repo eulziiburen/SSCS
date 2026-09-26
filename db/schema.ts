@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { blob, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const tours = sqliteTable("tours", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -10,6 +10,7 @@ export const tours = sqliteTable("tours", {
   countryEn: text("country_en"),
   routeEn: text("route_en"), // JSON string[]
   heroEyebrowEn: text("hero_eyebrow_en"),
+  imageId: integer("image_id"), // uploaded photo (images.id); falls back to the scene illustration
   startDate: text("start_date").notNull(), // YYYY-MM-DD
   endDate: text("end_date").notNull(), // YYYY-MM-DD
   seats: integer("seats").notNull(),
@@ -49,6 +50,14 @@ export const news = sqliteTable("news", {
   titleEn: text("title_en"),
   textEn: text("text_en"),
   published: integer("published", { mode: "boolean" }).notNull().default(true),
+});
+
+// Uploaded photos live in the database so the site needs no separate file storage
+export const images = sqliteTable("images", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  mime: text("mime").notNull(),
+  data: blob("data", { mode: "buffer" }).notNull(),
+  createdAt: text("created_at").notNull(),
 });
 
 export const settings = sqliteTable("settings", {

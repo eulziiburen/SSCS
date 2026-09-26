@@ -59,13 +59,19 @@ CREATE TABLE IF NOT EXISTS news (
   text TEXT NOT NULL,
   published INTEGER NOT NULL DEFAULT 1
 );
+CREATE TABLE IF NOT EXISTS images (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  mime TEXT NOT NULL,
+  data BLOB NOT NULL,
+  created_at TEXT NOT NULL
+);
 `;
 
 const TOUR_COLS = ["kind", "scene", "country", "title", "start_date", "end_date", "seats", "price", "route", "badge", "hot", "featured", "hero_eyebrow", "upcoming", "published"];
 
 // Columns added after the first release; CREATE TABLE IF NOT EXISTS won't add them to an existing table
 const ADDED_COLUMNS: Record<string, string[]> = {
-  tours: ["title_en", "country_en", "route_en", "hero_eyebrow_en"],
+  tours: ["title_en", "country_en", "route_en", "hero_eyebrow_en", "image_id INTEGER"],
   news: ["title_en", "text_en"],
   bookings: ["details", "email"],
 };
@@ -74,10 +80,12 @@ async function migrate() {
   for (const [table, cols] of Object.entries(ADDED_COLUMNS)) {
     const { rows } = await client.execute(`PRAGMA table_info(${table})`);
     const have = new Set(rows.map((r) => String(r.name)));
-    for (const col of cols) {
+    for (const spec of cols) {
+      // "name" or "name TYPE"; TEXT when no type is given
+      const [col, type = "TEXT"] = spec.split(" ");
       if (have.has(col)) continue;
       try {
-        await client.execute(`ALTER TABLE ${table} ADD COLUMN ${col} TEXT`);
+        await client.execute(`ALTER TABLE ${table} ADD COLUMN ${col} ${type}`);
       } catch (e) {
         // Another instance may have added it between our check and the ALTER
         if (!String(e).includes("duplicate column")) throw e;
