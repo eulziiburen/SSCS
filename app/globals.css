@@ -1,7 +1,8 @@
 :root {
-  --sky: #2b5c8a; --sky-deep: #173a5c; --saffron: #e0891b; --saffron-ink: #1b1206; --grass: #4f7a34; --danger: #c73a27;
-  --ink: #15212c; --muted: #56636e; --bg: #f3f6f7; --surface: #ffffff; --line: #dce3e7;
-  --chip: #e6eef4; --shadow: 0 10px 30px rgba(21, 33, 44, 0.1); --shadow-sm: 0 1px 3px rgba(21, 33, 44, 0.08);
+  /* Soft Travel brand: blue #2346E0, orange #FF7A2F, navy #0F1A33 */
+  --sky: #2346e0; --sky-deep: #0f1a33; --saffron: #ff7a2f; --saffron-ink: #1b0d04; --grass: #3f8a4a; --danger: #c73a27;
+  --ink: #0f1a33; --muted: #55607a; --bg: #f4f6fb; --surface: #ffffff; --line: #dde3ef;
+  --chip: #e8edfb; --shadow: 0 10px 30px rgba(15, 26, 51, 0.1); --shadow-sm: 0 1px 3px rgba(15, 26, 51, 0.08);
   --display: var(--font-display), "Arial Black", system-ui, sans-serif;
   --body: var(--font-body), system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: var(--font-mono), ui-monospace, Consolas, monospace;
@@ -11,16 +12,26 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --sky: #6fa3d6; --sky-deep: #0e1f30; --saffron: #f0a040; --grass: #8dba6b; --danger: #f07a66;
-    --ink: #e7edf2; --muted: #9aa8b4; --bg: #0f1720; --surface: #17222d; --line: #26343f;
-    --chip: #1f2e3b; --shadow: 0 10px 30px rgba(0, 0, 0, 0.35); --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --sky: #8198ff; --sky-deep: #0a1226; --saffron: #ff8f4f; --grass: #7cc488; --danger: #f07a66;
+    --ink: #e8ecf6; --muted: #9ba5bd; --bg: #0c1222; --surface: #151d31; --line: #25304a;
+    --chip: #1c2640; --shadow: 0 10px 30px rgba(0, 0, 0, 0.35); --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --sky: #6fa3d6; --sky-deep: #0e1f30; --saffron: #f0a040; --grass: #8dba6b; --danger: #f07a66;
-  --ink: #e7edf2; --muted: #9aa8b4; --bg: #0f1720; --surface: #17222d; --line: #26343f;
-  --chip: #1f2e3b; --shadow: 0 10px 30px rgba(0, 0, 0, 0.35); --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --sky: #8198ff; --sky-deep: #0a1226; --saffron: #ff8f4f; --grass: #7cc488; --danger: #f07a66;
+  --ink: #e8ecf6; --muted: #9ba5bd; --bg: #0c1222; --surface: #151d31; --line: #25304a;
+  --chip: #1c2640; --shadow: 0 10px 30px rgba(0, 0, 0, 0.35); --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* brand logo: pick the variant that reads on the current surface */
+.brand-logo { display: block; height: auto; max-width: 100%; }
+.brand-logo.on-dark { display: none; }
+:root[data-theme="dark"] .brand-logo.on-light { display: none; }
+:root[data-theme="dark"] .brand-logo.on-dark { display: block; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .brand-logo.on-light { display: none; }
+  :root:not([data-theme="light"]) .brand-logo.on-dark { display: block; }
 }
 
 /* light / dark switch — the active side follows the resolved theme */
@@ -177,16 +188,16 @@ button { font: inherit; cursor: pointer; color: inherit; }
 
 /* voucher */
 .voucher { margin-top: 64px; border-radius: 22px; overflow: hidden; display: grid; grid-template-columns: 1.2fr 1fr; background: var(--sky); color: #fff; }
-:root[data-theme="dark"] .voucher { background: #1d4670; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .voucher { background: #1d4670; } }
+:root[data-theme="dark"] .voucher { background: #1a2c86; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .voucher { background: #1a2c86; } }
 .v-txt { padding: 36px; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; justify-content: center; }
 .voucher h2 { font-size: clamp(22px, 2.6vw, 30px); }
 .voucher p { max-width: 52ch; opacity: 0.92; }
 .ticket { position: relative; margin: 28px; background: #fff7ea; color: #2a1b06; border-radius: 14px; padding: 22px 24px; display: flex; flex-direction: column; gap: 8px; align-self: center; transform: rotate(-2deg); transition: transform 0.3s; }
 .voucher:hover .ticket { transform: rotate(0); }
 .ticket::before, .ticket::after { content: ""; position: absolute; top: 50%; width: 22px; height: 22px; border-radius: 50%; background: inherit; background: var(--sky); transform: translateY(-50%); }
-:root[data-theme="dark"] .ticket::before, :root[data-theme="dark"] .ticket::after { background: #1d4670; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ticket::before, :root:not([data-theme="light"]) .ticket::after { background: #1d4670; } }
+:root[data-theme="dark"] .ticket::before, :root[data-theme="dark"] .ticket::after { background: #1a2c86; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ticket::before, :root:not([data-theme="light"]) .ticket::after { background: #1a2c86; } }
 .ticket::before { left: -11px; }
 .ticket::after { right: -11px; }
 .t-l { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #8a5a12; }

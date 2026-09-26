@@ -8,8 +8,7 @@ export function Footer() {
         <div className="cols">
           <div>
             <div className="logo">
-              <Logo size={28} />
-              ТАЛ АЯЛАЛ
+              <Logo tone="dark" height={28} />
             </div>
             <p>Монгол орон болон дэлхийн өнцөг булан бүрээр тухтай, найдвартай аялуулна.</p>
           </div>
@@ -33,7 +32,7 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="copy">© 2026 Тал Аялал ХХК. Бүх эрх хуулиар хамгаалагдсан.</div>
+        <div className="copy">© 2026 Soft Travel. Бүх эрх хуулиар хамгаалагдсан.</div>
       </div>
     </footer>
   );

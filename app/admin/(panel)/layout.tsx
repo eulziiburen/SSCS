@@ -18,8 +18,7 @@ export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
       <header className="a-top">
         <div className="a-wrap">
           <Link href="/admin" className="logo">
-            <Logo size={28} />
-            ТАЛ АЯЛАЛ <span className="a-tag">Admin</span>
+            <Logo height={24} /> <span className="a-tag">Admin</span>
           </Link>
           <AdminNav newCount={newCount} />
           <div className="a-top-end">

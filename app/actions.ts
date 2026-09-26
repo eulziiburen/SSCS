@@ -36,7 +36,7 @@ export async function createBooking(input: BookingInput): Promise<BookingResult>
 
   await ensureDb();
   for (let attempt = 0; attempt < 5; attempt++) {
-    const code = "ТА-" + Math.floor(100000 + Math.random() * 900000);
+    const code = "ST-" + Math.floor(100000 + Math.random() * 900000);
     try {
       await db.insert(bookings).values({
         code,

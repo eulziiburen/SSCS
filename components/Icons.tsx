@@ -86,12 +86,25 @@ export const PhoneIcon = (p: P) => (
   </svg>
 );
 
-export function Logo({ size = 32 }: { size?: number }) {
+export const BRAND = "Soft Travel";
+
+const LOGO_RATIO = 1625 / 280;
+
+/**
+ * Soft Travel wordmark. `tone="auto"` follows the site theme (the dark-surface
+ * version has a light "soft"); `tone="dark"` is for always-dark surfaces like the footer.
+ */
+export function Logo({ height = 30, tone = "auto", priority = false }: { height?: number; tone?: "auto" | "dark"; priority?: boolean }) {
+  const width = Math.round(height * LOGO_RATIO);
+  const img = (src: string, className?: string) => (
+    // eslint-disable-next-line @next/next/no-img-element -- tiny static PNGs; both variants must exist in the HTML for the CSS theme switch
+    <img src={src} width={width} height={height} alt={BRAND} className={className} fetchPriority={priority ? "high" : undefined} />
+  );
+  if (tone === "dark") return img("/brand/logo-dark.png", "brand-logo");
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
-      <circle cx="16" cy="16" r="15" fill="#2B5C8A" />
-      <circle cx="21" cy="11" r="4" fill="#FFD08A" />
-      <path d="M1 22 L10 13 L16 19 L21 15 L31 23 A15 15 0 0 1 1 22Z" fill="#4F7A34" />
-    </svg>
+    <>
+      {img("/brand/logo.png", "brand-logo on-light")}
+      {img("/brand/logo-dark.png", "brand-logo on-dark")}
+    </>
   );
 }

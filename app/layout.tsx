@@ -7,15 +7,15 @@ const body = Manrope({ subsets: ["latin", "cyrillic"], variable: "--font-body" }
 const mono = JetBrains_Mono({ subsets: ["latin", "cyrillic"], weight: ["500", "700"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: { default: "Тал Аялал — Гадаад, дотоод аялал", template: "%s · Тал Аялал" },
+  title: { default: "Soft Travel — Гадаад, дотоод аялал", template: "%s · Soft Travel" },
   description: "Монгол орон болон дэлхийн өнцөг булан бүрээр тухтай, найдвартай аялуулна. Гадаад, дотоод, өдрийн аяллууд.",
 };
 
 export const viewport: Viewport = {
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F3F6F7" },
-    { media: "(prefers-color-scheme: dark)", color: "#0F1720" },
+    { media: "(prefers-color-scheme: light)", color: "#F4F6FB" },
+    { media: "(prefers-color-scheme: dark)", color: "#0C1222" },
   ],
 };
 

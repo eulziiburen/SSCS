@@ -108,7 +108,7 @@ export default async function Home() {
           <div className="ticket" aria-hidden="true">
             <span className="t-l">Аяллын эрхийн бичиг</span>
             <span className="t-v">{fmt(VOUCHER_PRICE)}</span>
-            <span className="t-n">№ ТА-2026-0418 · 2027.09.26 хүртэл</span>
+            <span className="t-n">№ ST-2026-0418 · 2027.09.26 хүртэл</span>
           </div>
         </div>
       </section>

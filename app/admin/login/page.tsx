@@ -15,8 +15,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/admin/logi
     <main className="login">
       <form action={login} className="login-card">
         <div className="logo">
-          <Logo />
-          ТАЛ АЯЛАЛ <span className="a-tag">Admin</span>
+          <Logo height={26} /> <span className="a-tag">Admin</span>
         </div>
         {error && (
           <p className="a-alert" role="alert">

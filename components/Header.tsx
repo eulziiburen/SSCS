@@ -53,9 +53,8 @@ export function Header() {
   return (
     <header className="top">
       <div className="wrap">
-        <Link className="logo" href="/" aria-label="Тал Аялал нүүр">
-          <Logo />
-          ТАЛ АЯЛАЛ
+        <Link className="logo" href="/" aria-label="Soft Travel — нүүр хуудас">
+          <Logo priority />
         </Link>
         <nav className={`nav${open ? " open" : ""}`} id="main-nav" aria-label="Үндсэн цэс">
           {NAV.map((n) => (
