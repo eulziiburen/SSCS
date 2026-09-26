@@ -509,3 +509,12 @@ img.art.photo { object-fit: cover; }
   .a-stats-edit > .label { display: none; }
   .a-stats-row { display: grid; gap: 6px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
 }
+
+/* phone number with country code */
+.phone-group { display: flex; align-items: stretch; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); min-height: 46px; }
+.phone-group:focus-within { border-color: var(--sky); box-shadow: 0 0 0 3px color-mix(in srgb, var(--sky) 25%, transparent); }
+.phone-group.invalid { border-color: var(--danger); }
+.phone-dial { position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 0 10px 0 12px; border-right: 1px solid var(--line); font-weight: 700; white-space: nowrap; flex: none; color: var(--ink); }
+.phone-dial svg { color: var(--muted); }
+.phone-dial select { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; font: inherit; }
+.phone-group input { flex: 1; min-width: 0; border: 0 !important; background: transparent !important; box-shadow: none !important; outline: none; }

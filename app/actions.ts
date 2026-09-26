@@ -6,9 +6,11 @@ import { bookings } from "@/db/schema";
 import { calculate, type CalcInput } from "@/lib/calc";
 import { isEmail, VOUCHER_AMOUNTS } from "@/lib/data";
 import { getDictionary, isLocale, type Locale } from "@/lib/i18n";
+import { DEFAULT_DIAL, dialByIso, formatPhone, isValidPhone } from "@/lib/phone";
 import { getCalcSettings, getTour } from "@/lib/queries";
 
-type Common = { name: string; phone: string; email: string; pax: number; locale?: Locale };
+// dial is the ISO country of the phone number (e.g. "MN"); missing means Mongolia for older clients
+type Common = { name: string; phone: string; dial?: string; email: string; pax: number; locale?: Locale };
 export type BookingInput =
   | ({ type: "tour"; tourId: number; calc?: Partial<CalcInput> } & Common)
   | ({ type: "voucher"; amount: number } & Common);
@@ -21,10 +23,12 @@ const ADDON_MN = { sim: "Дата сим", insurance: "Даатгал", guide: "
 export async function createBooking(input: BookingInput): Promise<BookingResult> {
   const msg = getDictionary(isLocale(input.locale) ? input.locale : "mn").errors;
   const name = String(input.name ?? "").trim().slice(0, 120);
-  const phone = String(input.phone ?? "").replace(/\D/g, "");
+  const dial = dialByIso(String(input.dial ?? "")) ?? DEFAULT_DIAL;
+  const rawPhone = String(input.phone ?? "");
   let pax = Math.floor(Number(input.pax));
   const email = String(input.email ?? "").trim().toLowerCase();
-  if (!name || phone.length !== 8) return { ok: false, error: msg.input };
+  if (!name || !isValidPhone(dial.iso, rawPhone)) return { ok: false, error: msg.input };
+  const phone = formatPhone(dial.iso, rawPhone);
   if (!isEmail(email)) return { ok: false, error: msg.email };
 
   // Prices always come from the server, never from the browser
@@ -70,7 +74,7 @@ export async function createBooking(input: BookingInput): Promise<BookingResult>
         tourId,
         tourTitle,
         name,
-        phone: `${phone.slice(0, 4)} ${phone.slice(4)}`,
+        phone,
         email,
         pax,
         unitPrice,

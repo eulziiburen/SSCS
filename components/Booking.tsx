@@ -3,8 +3,10 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import { createBooking } from "@/app/actions";
 import { dateRange, fmt, isEmail, VOUCHER_AMOUNTS, VOUCHER_PRICE, type Tour } from "@/lib/data";
+import { DEFAULT_DIAL, formatPhone, isValidPhone } from "@/lib/phone";
 import { CheckIcon, XIcon } from "./Icons";
 import { useI18n } from "./LocaleProvider";
+import { PhoneField } from "./PhoneField";
 
 export type BookableTour = Pick<Tour, "id" | "title" | "startDate" | "endDate" | "seats" | "price">;
 
@@ -83,6 +85,7 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
   const maxPax = isVoucher ? 10 : Math.max(1, target.tour.seats);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [iso, setIso] = useState(DEFAULT_DIAL.iso);
   const [email, setEmail] = useState("");
   const [pax, setPax] = useState(Math.min(2, maxPax));
   const [amount, setAmount] = useState(VOUCHER_PRICE);
@@ -92,9 +95,9 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
   const [serverErr, setServerErr] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const digits = phone.replace(/\D/g, "");
+  const phoneOk = isValidPhone(iso, phone);
   const nameErr = touched && !name.trim() ? b.nameError : null;
-  const phoneErr = touched && digits.length !== 8 ? b.phoneError : null;
+  const phoneErr = touched && !phoneOk ? b.phoneError(iso === "MN") : null;
   const emailErr = touched && !isEmail(email.trim()) ? b.emailError : null;
   const unit = isVoucher ? amount : target.tour.price;
   const total = unit * pax;
@@ -102,12 +105,12 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     setTouched(true);
-    if (!name.trim() || digits.length !== 8 || !isEmail(email.trim())) return;
+    if (!name.trim() || !phoneOk || !isEmail(email.trim())) return;
     setServerErr(null);
     startTransition(async () => {
       try {
         const res = await createBooking(
-          target.type === "voucher" ? { type: "voucher", amount, name, phone, email, pax, locale } : { type: "tour", tourId: target.tour.id, name, phone, email, pax, locale },
+          target.type === "voucher" ? { type: "voucher", amount, name, phone, dial: iso, email, pax, locale } : { type: "tour", tourId: target.tour.id, name, phone, dial: iso, email, pax, locale },
         );
         if (res.ok) setCode(res.code);
         else setServerErr(res.error);
@@ -125,7 +128,7 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
         </span>
         <h3 id="dlg-title">{b.doneTitle}</h3>
         <p>
-          {b.doneText(name.trim())} <strong>{phone}</strong> {b.doneText2}
+          {b.doneText(name.trim())} <strong>{formatPhone(iso, phone)}</strong> {b.doneText2}
         </p>
         <div className="sum">
           <span>{b.code}</span>
@@ -212,25 +215,9 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
         )}
       </div>
 
+      <PhoneField id="b-phone" iso={iso} onIso={setIso} value={phone} onChange={setPhone} error={phoneErr} />
+
       <div className="row">
-        <div className="field">
-          <label htmlFor="b-phone">{b.phone}</label>
-          <input
-            id="b-phone"
-            inputMode="tel"
-            autoComplete="tel"
-            placeholder="9911 2233"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            aria-invalid={!!phoneErr}
-            aria-describedby={phoneErr ? "b-phone-err" : undefined}
-          />
-          {phoneErr && (
-            <span className="err" id="b-phone-err">
-              {phoneErr}
-            </span>
-          )}
-        </div>
         <div className="field">
           <span className="label" id="b-pax-label">
             {isVoucher ? b.quantity : b.people}
