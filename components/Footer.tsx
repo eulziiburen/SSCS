@@ -26,7 +26,7 @@ export function Footer() {
             <h4>Холбоо барих</h4>
             <ul>
               <li><a href="tel:+97670000000">(+976) 7000-0000</a></li>
-              <li><a href="mailto:info@talayalal.mn">info@talayalal.mn</a></li>
+              <li><a href="mailto:info@sscs.mn">info@sscs.mn</a></li>
               <li>Улаанбаатар, Сүхбаатар дүүрэг, 1-р хороо, Төв цамхаг 8 давхар</li>
               <li>Даваа–Баасан 09:00–18:00</li>
             </ul>
