@@ -35,7 +35,7 @@ export function TourCard({ tour, idPrefix = "c" }: { tour: Tour; idPrefix?: stri
             {fmt(tour.price)}
             <small>1 хүний үнэ</small>
           </div>
-          <BookButton tourId={tour.id} className="btn sm raise">
+          <BookButton tour={tour} className="btn sm raise">
             Захиалах
           </BookButton>
         </div>

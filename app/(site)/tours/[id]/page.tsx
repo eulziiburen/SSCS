@@ -5,23 +5,24 @@ import { BookButton } from "@/components/Booking";
 import { CalendarIcon, CheckIcon, ClockIcon, PhoneIcon, PinIcon, SeatIcon, XIcon } from "@/components/Icons";
 import { SceneArt } from "@/components/SceneArt";
 import { TourCard } from "@/components/TourCard";
-import { dateRange, daysLabel, EXCLUDES, fmt, INCLUDES, KIND_LABEL, tourById, TOURS } from "@/lib/data";
+import { dateRange, daysLabel, EXCLUDES, fmt, INCLUDES, KIND_LABEL } from "@/lib/data";
+import { getTour, getTours } from "@/lib/queries";
 
-export function generateStaticParams() {
-  return TOURS.map((t) => ({ id: String(t.id) }));
+export async function generateStaticParams() {
+  return (await getTours()).map((t) => ({ id: String(t.id) }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/tours/[id]">): Promise<Metadata> {
-  const tour = tourById(Number((await params).id));
-  if (!tour) return {};
+  const tour = await getTour(Number((await params).id));
+  if (!tour?.published) return {};
   return { title: tour.title, description: `${tour.country} · ${dateRange(tour)} · ${daysLabel(tour)} · ${fmt(tour.price)}-өөс` };
 }
 
 export default async function TourPage({ params }: PageProps<"/tours/[id]">) {
-  const tour = tourById(Number((await params).id));
-  if (!tour) notFound();
+  const tour = await getTour(Number((await params).id));
+  if (!tour?.published) notFound();
 
-  const related = TOURS.filter((t) => t.kind === tour.kind && t.id !== tour.id).slice(0, 3);
+  const related = (await getTours()).filter((t) => t.kind === tour.kind && t.id !== tour.id).slice(0, 3);
   const low = tour.seats <= 3;
 
   return (
@@ -99,7 +100,7 @@ export default async function TourPage({ params }: PageProps<"/tours/[id]">) {
             <small>1 хүний үнэ</small>
           </div>
           {low && <p className="urgent">Сүүлийн {tour.seats} суудал үлдлээ</p>}
-          <BookButton tourId={tour.id} className="btn lg full">
+          <BookButton tour={tour} className="btn lg full">
             Захиалах
           </BookButton>
           <a className="btn ghost full" href="tel:+97670000000">
@@ -127,7 +128,7 @@ export default async function TourPage({ params }: PageProps<"/tours/[id]">) {
           {fmt(tour.price)}
           <small>1 хүний үнэ</small>
         </div>
-        <BookButton tourId={tour.id}>Захиалах</BookButton>
+        <BookButton tour={tour}>Захиалах</BookButton>
       </div>
     </>
   );

@@ -1,8 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Manrope, Unbounded } from "next/font/google";
-import { BookingProvider } from "@/components/Booking";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import "./globals.css";
 
 const display = Unbounded({ subsets: ["latin", "cyrillic"], weight: ["500", "700", "800"], variable: "--font-display" });
@@ -36,11 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <a className="skip" href="#main">
           Үндсэн агуулга руу шилжих
         </a>
-        <BookingProvider>
-          <Header />
-          <main id="main">{children}</main>
-          <Footer />
-        </BookingProvider>
+        {children}
       </body>
     </html>
   );

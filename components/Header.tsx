@@ -13,14 +13,28 @@ const NAV = [
   { href: "/#contact", label: "Холбоо барих" },
 ];
 
-function toggleTheme() {
-  const root = document.documentElement;
-  const current = root.dataset.theme ?? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-  const next = current === "dark" ? "light" : "dark";
-  root.dataset.theme = next;
+function setTheme(theme: "light" | "dark") {
+  document.documentElement.dataset.theme = theme;
   try {
-    localStorage.setItem("theme", next);
+    localStorage.setItem("theme", theme);
   } catch {}
+}
+
+// The active option is highlighted purely in CSS (see .theme-switch), so the server
+// render never has to guess the visitor's theme.
+function ThemeSwitch() {
+  return (
+    <div className="theme-switch" role="group" aria-label="Өнгөний горим">
+      <button type="button" className="t-light" onClick={() => setTheme("light")}>
+        <SunIcon width={16} height={16} />
+        <span>Цайвар</span>
+      </button>
+      <button type="button" className="t-dark" onClick={() => setTheme("dark")}>
+        <MoonIcon width={16} height={16} />
+        <span>Бараан</span>
+      </button>
+    </div>
+  );
 }
 
 export function Header() {
@@ -53,10 +67,7 @@ export function Header() {
             (+976) 7000-0000
           </a>
         </nav>
-        <button type="button" className="icon-btn" onClick={toggleTheme} aria-label="Өнгөний горим солих">
-          <MoonIcon className="show-light" />
-          <SunIcon className="show-dark" />
-        </button>
+        <ThemeSwitch />
         <button type="button" className="icon-btn menu-btn" aria-expanded={open} aria-controls="main-nav" aria-label="Цэс" onClick={() => setOpen((o) => !o)}>
           {open ? <XIcon /> : <MenuIcon />}
         </button>

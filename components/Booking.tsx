@@ -1,10 +1,13 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { dateRange, fmt, tourById, VOUCHER_PRICE, type Tour } from "@/lib/data";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, useTransition, type ReactNode } from "react";
+import { createBooking } from "@/app/actions";
+import { dateRange, fmt, VOUCHER_AMOUNTS, VOUCHER_PRICE, type Tour } from "@/lib/data";
 import { CheckIcon, XIcon } from "./Icons";
 
-type Target = { type: "tour"; tour: Tour } | { type: "voucher" };
+export type BookableTour = Pick<Tour, "id" | "title" | "startDate" | "endDate" | "seats" | "price">;
+
+type Target = { type: "tour"; tour: BookableTour } | { type: "voucher" };
 
 const BookingContext = createContext<(t: Target) => void>(() => {});
 
@@ -12,7 +15,7 @@ export function useBooking() {
   return useContext(BookingContext);
 }
 
-export function BookButton({ tourId, children, className = "btn" }: { tourId: number; children: ReactNode; className?: string }) {
+export function BookButton({ tour, children, className = "btn" }: { tour: BookableTour; children: ReactNode; className?: string }) {
   const open = useBooking();
   return (
     <button
@@ -20,8 +23,7 @@ export function BookButton({ tourId, children, className = "btn" }: { tourId: nu
       className={className}
       onClick={(e) => {
         e.preventDefault();
-        const tour = tourById(tourId);
-        if (tour) open({ type: "tour", tour });
+        open({ type: "tour", tour: { id: tour.id, title: tour.title, startDate: tour.startDate, endDate: tour.endDate, seats: tour.seats, price: tour.price } });
       }}
     >
       {children}
@@ -73,8 +75,6 @@ export function BookingProvider({ children }: { children: ReactNode }) {
   );
 }
 
-const VOUCHER_AMOUNTS = [200000, VOUCHER_PRICE, 1000000];
-
 function BookingForm({ target, onClose }: { target: Target; onClose: () => void }) {
   const isVoucher = target.type === "voucher";
   const maxPax = isVoucher ? 10 : Math.max(1, target.tour.seats);
@@ -85,6 +85,8 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
   const [touched, setTouched] = useState(false);
   const [code, setCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [serverErr, setServerErr] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
 
   const digits = phone.replace(/\D/g, "");
   const nameErr = touched && !name.trim() ? "Овог, нэрээ оруулна уу." : null;
@@ -96,7 +98,18 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
     e.preventDefault();
     setTouched(true);
     if (!name.trim() || digits.length !== 8) return;
-    setCode("ТА-" + Math.floor(100000 + Math.random() * 900000));
+    setServerErr(null);
+    startTransition(async () => {
+      try {
+        const res = await createBooking(
+          target.type === "voucher" ? { type: "voucher", amount, name, phone, pax } : { type: "tour", tourId: target.tour.id, name, phone, pax },
+        );
+        if (res.ok) setCode(res.code);
+        else setServerErr(res.error);
+      } catch {
+        setServerErr("Холболтын алдаа гарлаа. Дахин оролдоно уу.");
+      }
+    });
   }
 
   if (code) {
@@ -218,12 +231,18 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
         <strong>{fmt(total)}</strong>
       </div>
 
+      {serverErr && (
+        <p className="err" role="alert">
+          {serverErr}
+        </p>
+      )}
+
       <div className="actions">
         <button type="button" className="btn ghost" onClick={onClose}>
           Болих
         </button>
-        <button type="submit" className="btn">
-          Хүсэлт илгээх
+        <button type="submit" className="btn" disabled={pending}>
+          {pending ? "Илгээж байна…" : "Хүсэлт илгээх"}
         </button>
       </div>
       <p className="fine">Одоо төлбөр төлөхгүй. Менежер холбогдож баталгаажуулна.</p>

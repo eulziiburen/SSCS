@@ -3,6 +3,7 @@ import Link from "next/link";
 import { BUDGETS, MONTHS, SearchForm } from "@/components/SearchForm";
 import { TourCard } from "@/components/TourCard";
 import { filterTours, KIND_LABEL, type Filter, type Kind } from "@/lib/data";
+import { getTours } from "@/lib/queries";
 
 export const metadata: Metadata = {
   title: "Бүх аялал",
@@ -27,7 +28,7 @@ function href(f: Filter, patch: Partial<Filter>) {
 export default async function ToursPage({ searchParams }: PageProps<"/tours">) {
   const sp = await searchParams;
   const f: Filter = { q: one(sp.q), kind: one(sp.kind), month: one(sp.month), budget: one(sp.budget), sort: one(sp.sort) };
-  const list = filterTours(f);
+  const list = filterTours(await getTours(), f);
 
   const active = [
     f.q && { key: "q" as const, label: `“${f.q}”` },

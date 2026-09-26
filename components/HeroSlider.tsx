@@ -2,21 +2,23 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { fmt, SLIDES, tourById } from "@/lib/data";
+import { fmt, type SceneKey } from "@/lib/data";
 import { ArrowIcon, ChevronIcon } from "./Icons";
 import { SceneArt } from "./SceneArt";
 
 const INTERVAL = 6000;
 
-export function HeroSlider() {
+export type Slide = { id: number; eyebrow: string; title: string; scene: SceneKey; route: string[]; price: number };
+
+export function HeroSlider({ slides }: { slides: Slide[] }) {
   const [cur, setCur] = useState(0);
   const [paused, setPaused] = useState(false);
   const touchX = useRef<number | null>(null);
-  const n = SLIDES.length;
+  const n = slides.length;
   const go = (i: number) => setCur((i + n) % n);
 
   useEffect(() => {
-    if (paused || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (paused || n < 2 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const t = setTimeout(() => setCur((c) => (c + 1) % n), INTERVAL);
     return () => clearTimeout(t);
   }, [cur, paused, n]);
@@ -39,23 +41,22 @@ export function HeroSlider() {
       }}
     >
       <div className="slides">
-        {SLIDES.map((s, i) => {
-          const t = tourById(s.id)!;
+        {slides.map((s, i) => {
           return (
             <div key={s.id} className={`slide${i === cur ? " on" : ""}`} aria-hidden={i !== cur} aria-roledescription="slide" aria-label={`${i + 1} / ${n}`}>
-              <SceneArt scene={t.scene} id={`h${i}`} />
+              <SceneArt scene={s.scene} id={`h${i}`} />
               <div className="shade" />
               <div className="wrap txt">
                 <span className="eyebrow">{s.eyebrow}</span>
                 {i === 0 ? <h1>{s.title}</h1> : <h2 className="h1">{s.title}</h2>}
-                <span className="route">{t.route.join(" → ")}</span>
+                <span className="route">{s.route.join(" → ")}</span>
                 <div className="hero-cta">
-                  <Link className="btn lg" href={`/tours/${t.id}`} tabIndex={i === cur ? 0 : -1}>
+                  <Link className="btn lg" href={`/tours/${s.id}`} tabIndex={i === cur ? 0 : -1}>
                     Хөтөлбөр үзэх <ArrowIcon />
                   </Link>
                   <span className="from">
                     <small>эхлэх үнэ</small>
-                    {fmt(t.price)}
+                    {fmt(s.price)}
                   </span>
                 </div>
               </div>
@@ -65,7 +66,7 @@ export function HeroSlider() {
       </div>
       <div className="hero-ctrl wrap">
         <div className="dots">
-          {SLIDES.map((s, i) => (
+          {slides.map((s, i) => (
             <button key={s.id} type="button" aria-label={s.title} aria-current={i === cur} className={i === cur ? "on" : ""} onClick={() => go(i)}>
               {i === cur && !paused && <span className="fill" style={{ animationDuration: `${INTERVAL}ms` }} />}
             </button>

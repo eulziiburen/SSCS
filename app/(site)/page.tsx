@@ -5,7 +5,8 @@ import { ArrowIcon } from "@/components/Icons";
 import { SearchForm } from "@/components/SearchForm";
 import { Tabs } from "@/components/Tabs";
 import { TourCard } from "@/components/TourCard";
-import { KIND_LABEL, NEWS, REVIEWS, TOURS, UPCOMING_IDS, fmt, tourById, VOUCHER_PRICE, type Kind } from "@/lib/data";
+import { dotDate, fmt, KIND_LABEL, REVIEWS, VOUCHER_PRICE, type Kind } from "@/lib/data";
+import { getNews, getTours } from "@/lib/queries";
 
 const KINDS: Kind[] = ["abroad", "local", "day"];
 
@@ -24,10 +25,23 @@ const STATS = [
   { v: "24/7", l: "аяллын үеийн дэмжлэг" },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const [tours, news] = await Promise.all([getTours(), getNews()]);
+  const upcoming = tours.filter((t) => t.upcoming);
+  // Fall back to the soonest tours so the hero is never empty
+  const heroTours = tours.some((t) => t.featured) ? tours.filter((t) => t.featured) : tours.slice(0, 4);
+  const slides = heroTours.map((t) => ({
+    id: t.id,
+    eyebrow: t.heroEyebrow || `${KIND_LABEL[t.kind]} · ${t.days} өдөр`,
+    title: t.title,
+    scene: t.scene,
+    route: t.route,
+    price: t.price,
+  }));
+
   return (
     <>
-      <HeroSlider />
+      {slides.length > 0 && <HeroSlider slides={slides} />}
 
       <div className="wrap search-float">
         <SearchForm />
@@ -59,7 +73,8 @@ export default function Home() {
             label: KIND_LABEL[k],
             content: (
               <div className="grid">
-                {TOURS.filter((t) => t.kind === k)
+                {tours
+                  .filter((t) => t.kind === k)
                   .slice(0, 4)
                   .map((t) => (
                     <TourCard key={t.id} tour={t} idPrefix={`p${k}`} />
@@ -78,8 +93,8 @@ export default function Home() {
           </div>
         </div>
         <div className="grid">
-          {UPCOMING_IDS.map((id) => (
-            <TourCard key={id} tour={tourById(id)!} idPrefix="u" />
+          {upcoming.map((t) => (
+            <TourCard key={t.id} tour={t} idPrefix="u" />
           ))}
         </div>
 
@@ -153,9 +168,9 @@ export default function Home() {
           </div>
         </div>
         <div className="news">
-          {NEWS.map((n) => (
-            <article key={n.title}>
-              <time dateTime={n.date.replaceAll(".", "-")}>{n.date}</time>
+          {news.slice(0, 6).map((n) => (
+            <article key={n.id}>
+              <time dateTime={n.date}>{dotDate(n.date)}</time>
               <h3>{n.title}</h3>
               <p>{n.text}</p>
             </article>
