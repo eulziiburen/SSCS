@@ -80,6 +80,9 @@ export const BOOKING_STATUS = {
 } as const;
 export type BookingStatus = keyof typeof BOOKING_STATUS;
 
+// Deliberately loose: one @, a dot in the domain, no spaces. The manager confirms by phone anyway.
+export const isEmail = (v: string) => v.length <= 200 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+
 export const fmt = (n: number) => n.toLocaleString("en-US") + "₮";
 
 export const dotDate = (iso: string) => iso.replaceAll("-", ".");

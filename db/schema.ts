@@ -31,6 +31,7 @@ export const bookings = sqliteTable("bookings", {
   tourTitle: text("tour_title").notNull(),
   name: text("name").notNull(),
   phone: text("phone").notNull(),
+  email: text("email"), // nullable: bookings made before email was collected have none
   pax: integer("pax").notNull(),
   unitPrice: integer("unit_price").notNull(),
   total: integer("total").notNull(),

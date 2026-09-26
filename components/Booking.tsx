@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import { createBooking } from "@/app/actions";
-import { dateRange, fmt, VOUCHER_AMOUNTS, VOUCHER_PRICE, type Tour } from "@/lib/data";
+import { dateRange, fmt, isEmail, VOUCHER_AMOUNTS, VOUCHER_PRICE, type Tour } from "@/lib/data";
 import { CheckIcon, XIcon } from "./Icons";
 import { useI18n } from "./LocaleProvider";
 
@@ -83,6 +83,7 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
   const maxPax = isVoucher ? 10 : Math.max(1, target.tour.seats);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [pax, setPax] = useState(Math.min(2, maxPax));
   const [amount, setAmount] = useState(VOUCHER_PRICE);
   const [touched, setTouched] = useState(false);
@@ -94,18 +95,19 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
   const digits = phone.replace(/\D/g, "");
   const nameErr = touched && !name.trim() ? b.nameError : null;
   const phoneErr = touched && digits.length !== 8 ? b.phoneError : null;
+  const emailErr = touched && !isEmail(email.trim()) ? b.emailError : null;
   const unit = isVoucher ? amount : target.tour.price;
   const total = unit * pax;
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     setTouched(true);
-    if (!name.trim() || digits.length !== 8) return;
+    if (!name.trim() || digits.length !== 8 || !isEmail(email.trim())) return;
     setServerErr(null);
     startTransition(async () => {
       try {
         const res = await createBooking(
-          target.type === "voucher" ? { type: "voucher", amount, name, phone, pax, locale } : { type: "tour", tourId: target.tour.id, name, phone, pax, locale },
+          target.type === "voucher" ? { type: "voucher", amount, name, phone, email, pax, locale } : { type: "tour", tourId: target.tour.id, name, phone, email, pax, locale },
         );
         if (res.ok) setCode(res.code);
         else setServerErr(res.error);
@@ -186,6 +188,26 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
         {nameErr && (
           <span className="err" id="b-name-err">
             {nameErr}
+          </span>
+        )}
+      </div>
+
+      <div className="field">
+        <label htmlFor="b-email">{b.email}</label>
+        <input
+          id="b-email"
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          placeholder={b.emailPlaceholder}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          aria-invalid={!!emailErr}
+          aria-describedby={emailErr ? "b-email-err" : undefined}
+        />
+        {emailErr && (
+          <span className="err" id="b-email-err">
+            {emailErr}
           </span>
         )}
       </div>

@@ -37,6 +37,12 @@ export function BookingTable({ bookings, compact = false }: { bookings: BookingR
                 <strong>{b.name}</strong>
                 <small>
                   <a href={`tel:${b.phone.replace(/\s/g, "")}`}>{b.phone}</a>
+                  {b.email && (
+                    <>
+                      {" · "}
+                      <a href={`mailto:${b.email}`}>{b.email}</a>
+                    </>
+                  )}
                 </small>
               </td>
               <td>

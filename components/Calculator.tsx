@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { createBooking } from "@/app/actions";
 import { ADDON_UNIT, ADDONS, addonAvailable, calculate, convert, CURRENCIES, fmtCurrency, type Addon, type CalcSettings, type Currency } from "@/lib/calc";
-import { dateRange, dotDate, fmt, type Kind } from "@/lib/data";
+import { dateRange, dotDate, fmt, isEmail, type Kind } from "@/lib/data";
 import { CheckIcon } from "./Icons";
 import { useI18n } from "./LocaleProvider";
 
@@ -178,8 +178,8 @@ export function Calculator({ tours, settings, initialTourId }: { tours: CalcTour
         <CalcBooking
           key={`${tour.id}`}
           disabled={result.overSeats}
-          onSubmit={(name, phone) =>
-            createBooking({ type: "tour", tourId: tour.id, name, phone, pax: result.travelers, locale, calc: { adults, children, singleRooms, addons } })
+          onSubmit={(name, phone, email) =>
+            createBooking({ type: "tour", tourId: tour.id, name, phone, email, pax: result.travelers, locale, calc: { adults, children, singleRooms, addons } })
           }
         />
       </aside>
@@ -187,11 +187,12 @@ export function Calculator({ tours, settings, initialTourId }: { tours: CalcTour
   );
 }
 
-function CalcBooking({ disabled, onSubmit }: { disabled: boolean; onSubmit: (name: string, phone: string) => ReturnType<typeof createBooking> }) {
+function CalcBooking({ disabled, onSubmit }: { disabled: boolean; onSubmit: (name: string, phone: string, email: string) => ReturnType<typeof createBooking> }) {
   const { t } = useI18n();
   const b = t.booking;
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [touched, setTouched] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [code, setCode] = useState<string | null>(null);
@@ -199,6 +200,7 @@ function CalcBooking({ disabled, onSubmit }: { disabled: boolean; onSubmit: (nam
   const digits = phone.replace(/\D/g, "");
   const nameErr = touched && !name.trim() ? b.nameError : null;
   const phoneErr = touched && digits.length !== 8 ? b.phoneError : null;
+  const emailErr = touched && !isEmail(email.trim()) ? b.emailError : null;
 
   if (code) {
     return (
@@ -222,11 +224,11 @@ function CalcBooking({ disabled, onSubmit }: { disabled: boolean; onSubmit: (nam
       onSubmit={(e) => {
         e.preventDefault();
         setTouched(true);
-        if (!name.trim() || digits.length !== 8 || disabled) return;
+        if (!name.trim() || digits.length !== 8 || !isEmail(email.trim()) || disabled) return;
         setErr(null);
         start(async () => {
           try {
-            const res = await onSubmit(name, phone);
+            const res = await onSubmit(name, phone, email);
             if (res.ok) setCode(res.code);
             else setErr(res.error);
           } catch {
@@ -245,6 +247,11 @@ function CalcBooking({ disabled, onSubmit }: { disabled: boolean; onSubmit: (nam
         <label htmlFor="cb-phone">{b.phone}</label>
         <input id="cb-phone" inputMode="tel" autoComplete="tel" placeholder="9911 2233" value={phone} onChange={(e) => setPhone(e.target.value)} aria-invalid={!!phoneErr} />
         {phoneErr && <span className="err">{phoneErr}</span>}
+      </div>
+      <div className="field">
+        <label htmlFor="cb-email">{b.email}</label>
+        <input id="cb-email" type="email" inputMode="email" autoComplete="email" placeholder={b.emailPlaceholder} value={email} onChange={(e) => setEmail(e.target.value)} aria-invalid={!!emailErr} />
+        {emailErr && <span className="err">{emailErr}</span>}
       </div>
       {err && (
         <p className="err" role="alert">

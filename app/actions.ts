@@ -4,11 +4,11 @@ import { revalidatePath } from "next/cache";
 import { db, ensureDb } from "@/db/client";
 import { bookings } from "@/db/schema";
 import { calculate, type CalcInput } from "@/lib/calc";
-import { VOUCHER_AMOUNTS } from "@/lib/data";
+import { isEmail, VOUCHER_AMOUNTS } from "@/lib/data";
 import { getDictionary, isLocale, type Locale } from "@/lib/i18n";
 import { getCalcSettings, getTour } from "@/lib/queries";
 
-type Common = { name: string; phone: string; pax: number; locale?: Locale };
+type Common = { name: string; phone: string; email: string; pax: number; locale?: Locale };
 export type BookingInput =
   | ({ type: "tour"; tourId: number; calc?: Partial<CalcInput> } & Common)
   | ({ type: "voucher"; amount: number } & Common);
@@ -23,7 +23,9 @@ export async function createBooking(input: BookingInput): Promise<BookingResult>
   const name = String(input.name ?? "").trim().slice(0, 120);
   const phone = String(input.phone ?? "").replace(/\D/g, "");
   let pax = Math.floor(Number(input.pax));
+  const email = String(input.email ?? "").trim().toLowerCase();
   if (!name || phone.length !== 8) return { ok: false, error: msg.input };
+  if (!isEmail(email)) return { ok: false, error: msg.email };
 
   // Prices always come from the server, never from the browser
   let unitPrice: number;
@@ -69,6 +71,7 @@ export async function createBooking(input: BookingInput): Promise<BookingResult>
         tourTitle,
         name,
         phone: `${phone.slice(0, 4)} ${phone.slice(4)}`,
+        email,
         pax,
         unitPrice,
         total,

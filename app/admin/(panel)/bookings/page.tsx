@@ -13,7 +13,7 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
   const list = all.filter(
     (b) =>
       (!status || b.status === status) &&
-      (!needle || `${b.code} ${b.name} ${b.phone} ${b.tourTitle}`.toLowerCase().includes(needle)),
+      (!needle || `${b.code} ${b.name} ${b.phone} ${b.email ?? ""} ${b.tourTitle}`.toLowerCase().includes(needle)),
   );
   const count = (s: BookingStatus) => all.filter((b) => b.status === s).length;
 
@@ -33,7 +33,7 @@ export default async function BookingsPage({ searchParams }: PageProps<"/admin/b
         </div>
         <form className="a-search" role="search">
           {typeof status === "string" && <input type="hidden" name="status" value={status} />}
-          <input name="q" type="search" defaultValue={needle} placeholder="Нэр, утас, дугаараар хайх" aria-label="Захиалга хайх" />
+          <input name="q" type="search" defaultValue={needle} placeholder="Нэр, утас, и-мэйл, дугаараар хайх" aria-label="Захиалга хайх" />
         </form>
       </div>
       <section className="a-card flush">
