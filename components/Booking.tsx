@@ -6,6 +6,7 @@ import { dateRange, fmt, isEmail, VOUCHER_AMOUNTS, VOUCHER_PRICE, type Tour } fr
 import { DEFAULT_DIAL, formatPhone, isValidPhone } from "@/lib/phone";
 import { CheckIcon, XIcon } from "./Icons";
 import { useI18n } from "./LocaleProvider";
+import { NameFields } from "./NameFields";
 import { PhoneField } from "./PhoneField";
 
 export type BookableTour = Pick<Tour, "id" | "title" | "startDate" | "endDate" | "seats" | "price">;
@@ -55,7 +56,11 @@ export function BookingProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (target && dialog.current && !dialog.current.open) dialog.current.showModal();
+    if (target && dialog.current && !dialog.current.open) {
+      dialog.current.showModal();
+      // showModal focuses the first focusable element (the close button); start on the first field instead
+      dialog.current.querySelector<HTMLElement>("[autofocus], input")?.focus();
+    }
   }, [target, session]);
 
   const close = () => dialog.current?.close();
@@ -83,7 +88,8 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
   const { locale, t } = useI18n();
   const b = t.booking;
   const maxPax = isVoucher ? 10 : Math.max(1, target.tour.seats);
-  const [name, setName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [phone, setPhone] = useState("");
   const [iso, setIso] = useState(DEFAULT_DIAL.iso);
   const [email, setEmail] = useState("");
@@ -96,7 +102,7 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
   const [pending, startTransition] = useTransition();
 
   const phoneOk = isValidPhone(iso, phone);
-  const nameErr = touched && !name.trim() ? b.nameError : null;
+  const nameOk = !!lastName.trim() && !!firstName.trim();
   const phoneErr = touched && !phoneOk ? b.phoneError(iso === "MN") : null;
   const emailErr = touched && !isEmail(email.trim()) ? b.emailError : null;
   const unit = isVoucher ? amount : target.tour.price;
@@ -105,12 +111,12 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     setTouched(true);
-    if (!name.trim() || !phoneOk || !isEmail(email.trim())) return;
+    if (!nameOk || !phoneOk || !isEmail(email.trim())) return;
     setServerErr(null);
     startTransition(async () => {
       try {
         const res = await createBooking(
-          target.type === "voucher" ? { type: "voucher", amount, name, phone, dial: iso, email, pax, locale } : { type: "tour", tourId: target.tour.id, name, phone, dial: iso, email, pax, locale },
+          target.type === "voucher" ? { type: "voucher", amount, lastName, firstName, phone, dial: iso, email, pax, locale } : { type: "tour", tourId: target.tour.id, lastName, firstName, phone, dial: iso, email, pax, locale },
         );
         if (res.ok) setCode(res.code);
         else setServerErr(res.error);
@@ -128,7 +134,7 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
         </span>
         <h3 id="dlg-title">{b.doneTitle}</h3>
         <p>
-          {b.doneText(name.trim())} <strong>{formatPhone(iso, phone)}</strong> {b.doneText2}
+          {b.doneText(firstName.trim())} <strong>{formatPhone(iso, phone)}</strong> {b.doneText2}
         </p>
         <div className="sum">
           <span>{b.code}</span>
@@ -176,24 +182,7 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
         </div>
       )}
 
-      <div className="field">
-        <label htmlFor="b-name">{b.name}</label>
-        <input
-          id="b-name"
-          autoComplete="name"
-          placeholder={b.namePlaceholder}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          aria-invalid={!!nameErr}
-          aria-describedby={nameErr ? "b-name-err" : undefined}
-          autoFocus
-        />
-        {nameErr && (
-          <span className="err" id="b-name-err">
-            {nameErr}
-          </span>
-        )}
-      </div>
+      <NameFields idPrefix="b" lastName={lastName} firstName={firstName} onLastName={setLastName} onFirstName={setFirstName} touched={touched} autoFocus />
 
       <div className="field">
         <label htmlFor="b-email">{b.email}</label>

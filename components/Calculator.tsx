@@ -8,6 +8,7 @@ import { dateRange, dotDate, fmt, isEmail, type Kind } from "@/lib/data";
 import { DEFAULT_DIAL, formatPhone, isValidPhone } from "@/lib/phone";
 import { CheckIcon } from "./Icons";
 import { useI18n } from "./LocaleProvider";
+import { NameFields } from "./NameFields";
 import { PhoneField } from "./PhoneField";
 
 export type CalcTourOption = { id: number; title: string; price: number; days: number; kind: Kind; seats: number; startDate: string; endDate: string };
@@ -180,8 +181,8 @@ export function Calculator({ tours, settings, initialTourId }: { tours: CalcTour
         <CalcBooking
           key={`${tour.id}`}
           disabled={result.overSeats}
-          onSubmit={(name, phone, dial, email) =>
-            createBooking({ type: "tour", tourId: tour.id, name, phone, dial, email, pax: result.travelers, locale, calc: { adults, children, singleRooms, addons } })
+          onSubmit={({ lastName, firstName, phone, dial, email }) =>
+            createBooking({ type: "tour", tourId: tour.id, lastName, firstName, phone, dial, email, pax: result.travelers, locale, calc: { adults, children, singleRooms, addons } })
           }
         />
       </aside>
@@ -189,10 +190,13 @@ export function Calculator({ tours, settings, initialTourId }: { tours: CalcTour
   );
 }
 
-function CalcBooking({ disabled, onSubmit }: { disabled: boolean; onSubmit: (name: string, phone: string, dial: string, email: string) => ReturnType<typeof createBooking> }) {
+type Contact = { lastName: string; firstName: string; phone: string; dial: string; email: string };
+
+function CalcBooking({ disabled, onSubmit }: { disabled: boolean; onSubmit: (c: Contact) => ReturnType<typeof createBooking> }) {
   const { t } = useI18n();
   const b = t.booking;
-  const [name, setName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [phone, setPhone] = useState("");
   const [iso, setIso] = useState(DEFAULT_DIAL.iso);
   const [email, setEmail] = useState("");
@@ -201,7 +205,7 @@ function CalcBooking({ disabled, onSubmit }: { disabled: boolean; onSubmit: (nam
   const [code, setCode] = useState<string | null>(null);
   const [pending, start] = useTransition();
   const phoneOk = isValidPhone(iso, phone);
-  const nameErr = touched && !name.trim() ? b.nameError : null;
+  const nameOk = !!lastName.trim() && !!firstName.trim();
   const phoneErr = touched && !phoneOk ? b.phoneError(iso === "MN") : null;
   const emailErr = touched && !isEmail(email.trim()) ? b.emailError : null;
 
@@ -213,7 +217,7 @@ function CalcBooking({ disabled, onSubmit }: { disabled: boolean; onSubmit: (nam
         </span>
         <strong>{b.doneTitle}</strong>
         <p>
-          {b.doneText(name.trim())} <strong>{formatPhone(iso, phone)}</strong> {b.doneText2}
+          {b.doneText(firstName.trim())} <strong>{formatPhone(iso, phone)}</strong> {b.doneText2}
         </p>
         <span className="code">{code}</span>
       </div>
@@ -227,11 +231,11 @@ function CalcBooking({ disabled, onSubmit }: { disabled: boolean; onSubmit: (nam
       onSubmit={(e) => {
         e.preventDefault();
         setTouched(true);
-        if (!name.trim() || !phoneOk || !isEmail(email.trim()) || disabled) return;
+        if (!nameOk || !phoneOk || !isEmail(email.trim()) || disabled) return;
         setErr(null);
         start(async () => {
           try {
-            const res = await onSubmit(name, phone, iso, email);
+            const res = await onSubmit({ lastName, firstName, phone, dial: iso, email });
             if (res.ok) setCode(res.code);
             else setErr(res.error);
           } catch {
@@ -241,11 +245,7 @@ function CalcBooking({ disabled, onSubmit }: { disabled: boolean; onSubmit: (nam
       }}
     >
       <h3>{t.calc.bookTitle}</h3>
-      <div className="field">
-        <label htmlFor="cb-name">{b.name}</label>
-        <input id="cb-name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} aria-invalid={!!nameErr} />
-        {nameErr && <span className="err">{nameErr}</span>}
-      </div>
+      <NameFields idPrefix="cb" lastName={lastName} firstName={firstName} onLastName={setLastName} onFirstName={setFirstName} touched={touched} />
       <PhoneField id="cb-phone" iso={iso} onIso={setIso} value={phone} onChange={setPhone} error={phoneErr} />
       <div className="field">
         <label htmlFor="cb-email">{b.email}</label>

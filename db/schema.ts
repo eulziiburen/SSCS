@@ -30,7 +30,9 @@ export const bookings = sqliteTable("bookings", {
   type: text("type", { enum: ["tour", "voucher"] }).notNull(),
   tourId: integer("tour_id"),
   tourTitle: text("tour_title").notNull(),
-  name: text("name").notNull(),
+  name: text("name").notNull(), // "Овог Нэр", kept for display and older rows
+  lastName: text("last_name"),
+  firstName: text("first_name"),
   phone: text("phone").notNull(),
   email: text("email"), // nullable: bookings made before email was collected have none
   pax: integer("pax").notNull(),

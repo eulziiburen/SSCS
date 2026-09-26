@@ -518,3 +518,7 @@ img.art.photo { object-fit: cover; }
 .phone-dial svg { color: var(--muted); }
 .phone-dial select { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; font: inherit; }
 .phone-group input { flex: 1; min-width: 0; border: 0 !important; background: transparent !important; box-shadow: none !important; outline: none; }
+
+/* surname + given name side by side, stacked on narrow phones */
+.name-row { grid-template-columns: 1fr 1fr; }
+@media (max-width: 360px) { .name-row { grid-template-columns: 1fr; } }

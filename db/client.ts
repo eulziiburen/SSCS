@@ -73,7 +73,7 @@ const TOUR_COLS = ["kind", "scene", "country", "title", "start_date", "end_date"
 const ADDED_COLUMNS: Record<string, string[]> = {
   tours: ["title_en", "country_en", "route_en", "hero_eyebrow_en", "image_id INTEGER"],
   news: ["title_en", "text_en"],
-  bookings: ["details", "email"],
+  bookings: ["details", "email", "last_name", "first_name"],
 };
 
 async function migrate() {
