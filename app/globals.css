@@ -34,20 +34,19 @@
   :root:not([data-theme="light"]) .brand-logo.on-dark { display: block; }
 }
 
-/* light / dark switch — the active side follows the resolved theme */
-.theme-switch { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--chip); flex: none; }
-.theme-switch button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--muted); padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 700; transition: background 0.15s, color 0.15s; }
-.theme-switch button:hover { color: var(--ink); }
-.theme-switch .t-light, :root[data-theme="dark"] .theme-switch .t-dark { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
-:root[data-theme="dark"] .theme-switch .t-light { background: transparent; color: var(--muted); box-shadow: none; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .theme-switch .t-dark { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
-  :root:not([data-theme="light"]) .theme-switch .t-light { background: transparent; color: var(--muted); box-shadow: none; }
-}
-@media (max-width: 1040px) {
-  .theme-switch span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  .theme-switch button { padding: 7px 9px; }
-}
+/* header switches (language, color mode) — pill groups like totti.mn */
+.header-tools { display: flex; align-items: center; gap: 8px; flex: none; }
+.nav-tools { display: none; }
+.seg { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border-radius: 999px; border: 1.5px solid var(--line); flex: none; }
+.seg button { display: grid; place-items: center; min-width: 30px; height: 30px; padding: 0 8px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-size: 12.5px; font-weight: 800; letter-spacing: 0.04em; transition: background 0.15s, color 0.15s; }
+.seg button:hover { color: var(--ink); }
+.seg button svg { width: 16px; height: 16px; }
+.theme-switch button { padding: 0; width: 30px; }
+.lang-switch button[aria-pressed="true"],
+:root:not([data-theme-pref]) .theme-switch .t-system,
+:root[data-theme-pref="system"] .theme-switch .t-system,
+:root[data-theme-pref="light"] .theme-switch .t-light,
+:root[data-theme-pref="dark"] .theme-switch .t-dark { background: var(--saffron); color: var(--saffron-ink); }
 
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 16px); }
@@ -87,12 +86,14 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .nav a:not(.btn):hover, .nav a[aria-current="page"] { color: var(--ink); border-color: var(--saffron); }
 .nav-cta { display: none; }
 .menu-btn { display: none; }
-@media (max-width: 860px) {
+@media (max-width: 1100px) {
   .menu-btn { display: grid; }
   .nav { position: fixed; inset: calc(var(--header-h) + env(safe-area-inset-top, 0px)) 0 0 0; flex-direction: column; align-items: stretch; gap: 0; margin: 0; padding: 12px 20px 24px; background: var(--surface); opacity: 0; transform: translateY(-8px); visibility: hidden; transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s; overflow: auto; }
   .nav.open { opacity: 1; transform: none; visibility: visible; }
   .nav a:not(.btn) { font-size: 18px; padding: 14px 4px; border-bottom: 1px solid var(--line); color: var(--ink); }
   .nav-cta { display: inline-flex; margin-top: 20px; }
+  .header-tools { display: none; }
+  .nav-tools { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
 }
 
 /* hero */
@@ -437,3 +438,6 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .a-news p { color: var(--muted); font-size: 13.5px; }
 .a-news time { color: var(--muted); }
 .a-row-actions { display: flex; gap: 6px; align-items: flex-start; flex: none; }
+.a-hint { color: var(--muted); font-size: 13px; margin-top: 4px; }
+.a-span2 { grid-column: span 2; }
+@media (max-width: 460px) { .a-span2 { grid-column: auto; } }

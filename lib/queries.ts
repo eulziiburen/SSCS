@@ -3,15 +3,22 @@ import { db, ensureDb } from "@/db/client";
 import { bookings, news, tours, type TourRow } from "@/db/schema";
 import { daysBetween, SCENE_KEYS, type NewsItem, type SceneKey, type Tour } from "./data";
 
-export function toTour(row: TourRow): Tour {
-  let route: string[] = [];
+function parseList(json: string | null): string[] {
+  if (!json) return [];
   try {
-    route = JSON.parse(row.route);
-  } catch {}
+    const v = JSON.parse(json);
+    return Array.isArray(v) ? v.map(String) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function toTour(row: TourRow): Tour {
   return {
     ...row,
     scene: (SCENE_KEYS as readonly string[]).includes(row.scene) ? (row.scene as SceneKey) : "terelj",
-    route,
+    route: parseList(row.route),
+    routeEn: parseList(row.routeEn),
     days: daysBetween(row.startDate, row.endDate),
   };
 }

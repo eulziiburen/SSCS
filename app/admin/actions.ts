@@ -53,10 +53,13 @@ export async function saveTour(_prev: TourFormState, fd: FormData): Promise<Tour
   const endDate = str(fd, "endDate") || startDate;
   const price = Number(str(fd, "price").replace(/[^\d]/g, ""));
   const seats = Number(str(fd, "seats"));
-  const route = str(fd, "route")
-    .split(/\r?\n/)
-    .map((s) => s.trim())
-    .filter(Boolean);
+  const lines = (k: string) =>
+    str(fd, k)
+      .split(/\r?\n/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+  const route = lines("route");
+  const routeEn = lines("routeEn");
 
   const data = {
     kind: kind as "abroad" | "local" | "day",
@@ -72,6 +75,10 @@ export async function saveTour(_prev: TourFormState, fd: FormData): Promise<Tour
     hot: fd.get("hot") === "on",
     featured: fd.get("featured") === "on",
     heroEyebrow: str(fd, "heroEyebrow") || null,
+    titleEn: str(fd, "titleEn") || null,
+    countryEn: str(fd, "countryEn") || null,
+    routeEn: routeEn.length ? JSON.stringify(routeEn) : null,
+    heroEyebrowEn: str(fd, "heroEyebrowEn") || null,
     upcoming: fd.get("upcoming") === "on",
     published: fd.get("published") === "on",
   };
@@ -83,6 +90,7 @@ export async function saveTour(_prev: TourFormState, fd: FormData): Promise<Tour
   if (!(price > 0)) return fail("Үнэ оруулна уу.");
   if (!(Number.isInteger(seats) && seats >= 0)) return fail("Суудлын тоо буруу байна.");
   if (route.length < 2) return fail("Маршрутад дор хаяж 2 цэг оруулна уу (мөр бүрт нэг).");
+  if (routeEn.length && routeEn.length !== route.length) return fail(`Англи маршрут монголтой ижил тооны цэгтэй байх ёстой (${route.length}).`);
 
   if (id) {
     await db.update(tours).set(data).where(eq(tours.id, id));
@@ -146,6 +154,8 @@ export async function saveNews(fd: FormData) {
     date: str(fd, "date"),
     title: str(fd, "title"),
     text: str(fd, "text"),
+    titleEn: str(fd, "titleEn") || null,
+    textEn: str(fd, "textEn") || null,
     published: fd.get("published") === "on",
   };
   const path = id ? `/admin/news?edit=${id}` : "/admin/news";

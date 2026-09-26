@@ -46,6 +46,14 @@ export default async function NewsAdmin({ searchParams }: PageProps<"/admin/news
               <label htmlFor="n-text">Агуулга</label>
               <textarea id="n-text" name="text" rows={5} defaultValue={editing?.text} required />
             </div>
+            <div className="field">
+              <label htmlFor="n-title-en">Title (English)</label>
+              <input id="n-title-en" name="titleEn" lang="en" defaultValue={editing?.titleEn ?? ""} maxLength={200} placeholder="Хоосон бол монгол гарчиг гарна" />
+            </div>
+            <div className="field">
+              <label htmlFor="n-text-en">Text (English)</label>
+              <textarea id="n-text-en" name="textEn" lang="en" rows={3} defaultValue={editing?.textEn ?? ""} />
+            </div>
             <label className="a-check">
               <input type="checkbox" name="published" defaultChecked={editing?.published ?? true} /> Нийтлэх
             </label>

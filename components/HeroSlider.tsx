@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { fmt, type SceneKey } from "@/lib/data";
 import { ArrowIcon, ChevronIcon } from "./Icons";
+import { useI18n } from "./LocaleProvider";
 import { SceneArt } from "./SceneArt";
 
 const INTERVAL = 6000;
@@ -11,6 +12,7 @@ const INTERVAL = 6000;
 export type Slide = { id: number; eyebrow: string; title: string; scene: SceneKey; route: string[]; price: number };
 
 export function HeroSlider({ slides }: { slides: Slide[] }) {
+  const { t } = useI18n();
   const [cur, setCur] = useState(0);
   const [paused, setPaused] = useState(false);
   const touchX = useRef<number | null>(null);
@@ -27,7 +29,7 @@ export function HeroSlider({ slides }: { slides: Slide[] }) {
     <section
       className="hero"
       aria-roledescription="carousel"
-      aria-label="Онцлох аялал"
+      aria-label={t.hero.label}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -52,10 +54,10 @@ export function HeroSlider({ slides }: { slides: Slide[] }) {
                 <span className="route">{s.route.join(" → ")}</span>
                 <div className="hero-cta">
                   <Link className="btn lg" href={`/tours/${s.id}`} tabIndex={i === cur ? 0 : -1}>
-                    Хөтөлбөр үзэх <ArrowIcon />
+                    {t.hero.cta} <ArrowIcon />
                   </Link>
                   <span className="from">
-                    <small>эхлэх үнэ</small>
+                    <small>{t.hero.from}</small>
                     {fmt(s.price)}
                   </span>
                 </div>
@@ -73,10 +75,10 @@ export function HeroSlider({ slides }: { slides: Slide[] }) {
           ))}
         </div>
         <div className="arrows">
-          <button type="button" aria-label="Өмнөх" onClick={() => go(cur - 1)}>
+          <button type="button" aria-label={t.hero.prev} onClick={() => go(cur - 1)}>
             <ChevronIcon style={{ transform: "scaleX(-1)" }} />
           </button>
-          <button type="button" aria-label="Дараах" onClick={() => go(cur + 1)}>
+          <button type="button" aria-label={t.hero.next} onClick={() => go(cur + 1)}>
             <ChevronIcon />
           </button>
         </div>

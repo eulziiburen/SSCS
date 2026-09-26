@@ -38,33 +38,36 @@ export type Tour = {
   heroEyebrow: string | null;
   upcoming: boolean;
   published: boolean;
+  titleEn: string | null;
+  countryEn: string | null;
+  routeEn: string[];
+  heroEyebrowEn: string | null;
 };
 
-export type NewsItem = { id: number; date: string; title: string; text: string; published: boolean };
+export type NewsItem = { id: number; date: string; title: string; text: string; titleEn: string | null; textEn: string | null; published: boolean };
 
+// English falls back to Mongolian field by field, so a partly translated tour still renders
+export function localizeTour(t: Tour, locale: "mn" | "en"): Tour {
+  if (locale !== "en") return t;
+  return {
+    ...t,
+    title: t.titleEn || t.title,
+    country: t.countryEn || t.country,
+    route: t.routeEn.length ? t.routeEn : t.route,
+    heroEyebrow: t.heroEyebrowEn || null,
+  };
+}
+
+export function localizeNews(n: NewsItem, locale: "mn" | "en"): NewsItem {
+  return locale === "en" ? { ...n, title: n.titleEn || n.title, text: n.textEn || n.text } : n;
+}
+
+// Mongolian labels for the admin panel; the public site uses lib/i18n.ts
 export const KIND_LABEL: Record<Kind, string> = {
   abroad: "Гадаад аялал",
   local: "Дотоод аялал",
   day: "Өдрийн аялал",
 };
-
-export const INCLUDES: Record<Kind, string[]> = {
-  abroad: ["Хоёр талын нислэг", "Зочид буудал (2 хүн нэг өрөөнд)", "Өглөөний цай", "Хөтөлбөрийн дагуу тээвэр", "Монгол хэлтэй хөтөч", "Аяллын даатгал"],
-  local: ["Тээвэр (жолоочтой)", "Гэр кемп / жуулчны бааз", "Өдөрт 3 удаагийн хоол", "Хөтөч", "Үзвэрийн тасалбар"],
-  day: ["Автобусаар хүргэлт", "Өдрийн хоол", "Хөтөч", "Үзвэрийн тасалбар"],
-};
-
-export const EXCLUDES: Record<Kind, string[]> = {
-  abroad: ["Виз (шаардлагатай бол)", "Хувийн зардал", "Нэмэлт аялал"],
-  local: ["Морь, тэмээ унах", "Хувийн зардал"],
-  day: ["Морь унах", "Хувийн зардал"],
-};
-
-export const REVIEWS = [
-  { name: "Болормаа", trip: "Хөвсгөл · 3 хоног", text: "Зохион байгуулалт гайхалтай байсан. Хөтөч маань Хөвсгөлийн түүхийг их сонирхолтой ярьсан." },
-  { name: "Тэмүүлэн", trip: "Байгал нуур · 6 хоног", text: "Нислэг, буудал, хөтөлбөр бүгд цаг хугацаандаа, төлөвлөгөөний дагуу болсон." },
-  { name: "Анударь", trip: "Тэрэлж · өдрийн", text: "Гэр бүлээрээ амрахад их тохиромжтой. Хүүхдүүд маань морь унаад маш их баярласан." },
-];
 
 export const VOUCHER_PRICE = 500000;
 export const VOUCHER_AMOUNTS = [200000, VOUCHER_PRICE, 1000000];
@@ -84,8 +87,6 @@ export const dotDate = (iso: string) => iso.replaceAll("-", ".");
 export const dateRange = (t: Pick<Tour, "startDate" | "endDate">) =>
   t.startDate === t.endDate ? dotDate(t.startDate) : `${dotDate(t.startDate)} – ${dotDate(t.endDate.slice(5))}`;
 
-export const daysLabel = (t: Pick<Tour, "days">) => (t.days === 1 ? "1 өдөр" : `${t.days} өдөр ${t.days - 1} шөнө`);
-
 export const daysBetween = (start: string, end: string) => Math.round((Date.parse(end) - Date.parse(start)) / 86_400_000) + 1;
 
 export type Filter = { q?: string; kind?: string; month?: string; budget?: string; sort?: string };
@@ -93,7 +94,9 @@ export type Filter = { q?: string; kind?: string; month?: string; budget?: strin
 export function filterTours(tours: Tour[], { q, kind, month, budget, sort }: Filter): Tour[] {
   const needle = q?.trim().toLowerCase();
   const list = tours.filter((t) => {
-    if (needle && !`${t.title} ${t.country} ${t.route.join(" ")}`.toLowerCase().includes(needle)) return false;
+    // Search both languages so "Baikal" and "Байгал" find the same tour
+    const hay = [t.title, t.country, ...t.route, t.titleEn, t.countryEn, ...t.routeEn].filter(Boolean).join(" ").toLowerCase();
+    if (needle && !hay.includes(needle)) return false;
     if (kind && t.kind !== kind) return false;
     if (month && Number(t.startDate.slice(5, 7)) !== Number(month)) return false;
     if (budget && t.price > Number(budget)) return false;

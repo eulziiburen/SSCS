@@ -26,3 +26,28 @@ export const SEED_NEWS: (typeof news.$inferInsert)[] = [
   { date: "2026-09-18", title: "Байгал нуурын аялалд паспортын хугацааг шалгаарай", text: "Хилээр гарах өдрөөс хойш 6 сараас дээш хугацаатай паспорт шаардлагатай." },
   { date: "2026-09-10", title: "Цагаан сарын аяллын урьдчилсан бүртгэл нээгдлээ", text: "2027 оны 2-р сарын аяллуудад 10% хямдралтай урьдчилан бүртгүүлэх боломжтой." },
 ];
+
+// English copy for the seed content, keyed by the Mongolian title. Also used to backfill
+// databases created before the English columns existed.
+export const SEED_TOURS_EN: Record<string, { titleEn: string; countryEn: string; routeEn: string; heroEyebrowEn?: string }> = {
+  "Байгал нуур – Эрхүү хотын аялал": { titleEn: "Lake Baikal & Irkutsk", countryEn: "Russia", routeEn: r("Ulaanbaatar", "Irkutsk", "Listvyanka", "Ulaanbaatar"), heroEyebrowEn: "Only 2 seats left" },
+  "Шанхай хотын шууд нислэгтэй аялал (Диснейлэндтэй)": { titleEn: "Shanghai by direct flight (with Disneyland)", countryEn: "China", routeEn: r("Ulaanbaatar", "Shanghai", "Disneyland", "Ulaanbaatar") },
+  "Canton Fair 2026: Гуанжоу – Макао": { titleEn: "Canton Fair 2026: Guangzhou & Macau", countryEn: "China", routeEn: r("Ulaanbaatar", "Guangzhou", "Macau", "Ulaanbaatar") },
+  "Сөүл – Жэжү намрын аялал": { titleEn: "Seoul & Jeju in autumn", countryEn: "South Korea", routeEn: r("Ulaanbaatar", "Seoul", "Jeju", "Ulaanbaatar") },
+  "Манжуур хотын шууд нислэгтэй аялал · 4 шөнө 5 өдөр": { titleEn: "Manzhouli by direct flight · 5 days, 4 nights", countryEn: "China", routeEn: r("Ulaanbaatar", "Manzhouli", "Ulaanbaatar") },
+  "Хайнан арлын аялал": { titleEn: "Hainan Island", countryEn: "China", routeEn: r("Ulaanbaatar", "Haikou", "Sanya", "Ulaanbaatar") },
+  "Хайнан – Сингапур хосолсон аялал": { titleEn: "Hainan & Singapore combo", countryEn: "China · Singapore", routeEn: r("Ulaanbaatar", "Haikou", "Singapore", "Sanya", "Ulaanbaatar"), heroEyebrowEn: "From 29 September 2026" },
+  "Чунчин – Жанжиажэ шууд нислэгтэй аялал": { titleEn: "Chongqing & Zhangjiajie by direct flight", countryEn: "China", routeEn: r("Ulaanbaatar", "Chongqing", "Zhangjiajie", "Ulaanbaatar"), heroEyebrowEn: "Direct flight" },
+  "Хөвсгөл нуур – Хатгал тосгон": { titleEn: "Lake Khuvsgul & Khatgal village", countryEn: "Khuvsgul", routeEn: r("Ulaanbaatar", "Murun", "Khatgal", "Ulaanbaatar") },
+  "Хонгорын элс – Ёлын ам – Баянзаг": { titleEn: "Khongor Dunes, Yolyn Am & Bayanzag", countryEn: "Umnugovi", routeEn: r("Ulaanbaatar", "Dalanzadgad", "Yolyn Am", "Khongor Dunes", "Bayanzag", "Ulaanbaatar"), heroEyebrowEn: "Domestic · 6 days" },
+  "Алтай Таван Богд – Бүргэдийн баяр": { titleEn: "Altai Tavan Bogd & Golden Eagle Festival", countryEn: "Bayan-Ulgii", routeEn: r("Ulaanbaatar", "Ulgii", "Tavan Bogd", "Ulaanbaatar") },
+  "Тэрэлж – Мэлхий хад – Арьяабал хийд": { titleEn: "Terelj, Turtle Rock & Aryabal Temple", countryEn: "Tuv province", routeEn: r("Ulaanbaatar", "Turtle Rock", "Aryabal Temple", "Ulaanbaatar") },
+  "Хустайн нуруу – тахийн ажиглалт": { titleEn: "Khustai National Park: wild horse watching", countryEn: "Tuv province", routeEn: r("Ulaanbaatar", "Khustai National Park", "Ulaanbaatar") },
+  "Чингисийн морьт хөшөө – Горхи-Тэрэлж": { titleEn: "Chinggis Khaan Equestrian Statue & Gorkhi-Terelj", countryEn: "Tuv province", routeEn: r("Ulaanbaatar", "Tsonjin Boldog", "Gorkhi-Terelj", "Ulaanbaatar") },
+};
+
+export const SEED_NEWS_EN: Record<string, { titleEn: string; textEn: string }> = {
+  "Өвлийн улирлын виз мэдүүлэх хугацаа эхэллээ": { titleEn: "Winter visa applications are now open", textEn: "If you're traveling in December, we recommend submitting your visa documents before 20 October." },
+  "Байгал нуурын аялалд паспортын хугацааг шалгаарай": { titleEn: "Check your passport before a Baikal trip", textEn: "Your passport must be valid for more than 6 months after the date you cross the border." },
+  "Цагаан сарын аяллын урьдчилсан бүртгэл нээгдлээ": { titleEn: "Early booking for Lunar New Year trips is open", textEn: "Book February 2027 trips early and get 10% off." },
+};

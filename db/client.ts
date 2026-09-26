@@ -1,7 +1,7 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "./schema";
-import { SEED_NEWS, SEED_TOURS } from "./seed-data";
+import { SEED_NEWS, SEED_NEWS_EN, SEED_TOURS, SEED_TOURS_EN } from "./seed-data";
 
 const url = process.env.TURSO_DATABASE_URL;
 
@@ -59,8 +59,55 @@ CREATE TABLE IF NOT EXISTS news (
 
 const TOUR_COLS = ["kind", "scene", "country", "title", "start_date", "end_date", "seats", "price", "route", "badge", "hot", "featured", "hero_eyebrow", "upcoming", "published"];
 
+// Columns added after the first release; CREATE TABLE IF NOT EXISTS won't add them to an existing table
+const ADDED_COLUMNS: Record<string, string[]> = {
+  tours: ["title_en", "country_en", "route_en", "hero_eyebrow_en"],
+  news: ["title_en", "text_en"],
+};
+
+async function migrate() {
+  for (const [table, cols] of Object.entries(ADDED_COLUMNS)) {
+    const { rows } = await client.execute(`PRAGMA table_info(${table})`);
+    const have = new Set(rows.map((r) => String(r.name)));
+    for (const col of cols) {
+      if (have.has(col)) continue;
+      try {
+        await client.execute(`ALTER TABLE ${table} ADD COLUMN ${col} TEXT`);
+      } catch (e) {
+        // Another instance may have added it between our check and the ALTER
+        if (!String(e).includes("duplicate column")) throw e;
+      }
+    }
+  }
+}
+
+// Fills in English copy for seed rows that don't have it yet; admin-entered translations are never overwritten
+async function backfillEnglish() {
+  const tours = await client.execute("SELECT id, title FROM tours WHERE title_en IS NULL");
+  const newsRows = await client.execute("SELECT id, title FROM news WHERE title_en IS NULL");
+  const stmts = [
+    ...tours.rows.flatMap((r) => {
+      const en = SEED_TOURS_EN[String(r.title)];
+      return en
+        ? [{ sql: "UPDATE tours SET title_en = ?, country_en = ?, route_en = ?, hero_eyebrow_en = ? WHERE id = ? AND title_en IS NULL", args: [en.titleEn, en.countryEn, en.routeEn, en.heroEyebrowEn ?? null, r.id] }]
+        : [];
+    }),
+    ...newsRows.rows.flatMap((r) => {
+      const en = SEED_NEWS_EN[String(r.title)];
+      return en ? [{ sql: "UPDATE news SET title_en = ?, text_en = ? WHERE id = ? AND title_en IS NULL", args: [en.titleEn, en.textEn, r.id] }] : [];
+    }),
+  ];
+  if (stmts.length) await client.batch(stmts, "write");
+}
+
 async function init() {
   await client.executeMultiple(DDL);
+  await migrate();
+  await seed();
+  await backfillEnglish();
+}
+
+async function seed() {
   // A write transaction serializes concurrent first requests (e.g. parallel build workers), so seeding happens once
   const tx = await client.transaction("write");
   try {

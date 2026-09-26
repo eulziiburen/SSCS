@@ -1,46 +1,41 @@
 import Form from "next/form";
 import type { Filter } from "@/lib/data";
+import { getI18n } from "@/lib/locale";
 import { SearchIcon } from "./Icons";
 
-export const MONTHS = [
-  { v: "9", l: "9-р сар" },
-  { v: "10", l: "10-р сар" },
-  { v: "11", l: "11-р сар" },
-  { v: "12", l: "12-р сар" },
-];
+export const MONTHS = [9, 10, 11, 12];
 
-export const BUDGETS = [
-  { v: "1000000", l: "1 сая ₮ хүртэл" },
-  { v: "2500000", l: "2.5 сая ₮ хүртэл" },
-  { v: "4000000", l: "4 сая ₮ хүртэл" },
-];
+export const BUDGETS = ["1000000", "2500000", "4000000"];
+
+export const budgetMillions = (v: string) => String(Number(v) / 1_000_000);
 
 // Plain GET form: works without JS, and next/form turns it into a client navigation
-export function SearchForm({ values = {}, compact = false }: { values?: Filter; compact?: boolean }) {
+export async function SearchForm({ values = {}, compact = false }: { values?: Filter; compact?: boolean }) {
+  const { t } = await getI18n();
   return (
     <Form action="/tours" className={`search-form${compact ? " compact" : ""}`} role="search">
       <div className="field grow">
-        <label htmlFor="q">Хаашаа аялах вэ?</label>
-        <input id="q" name="q" type="search" placeholder="Жишээ: Байгал, Хайнан, Хөвсгөл" defaultValue={values.q} />
+        <label htmlFor="q">{t.search.where}</label>
+        <input id="q" name="q" type="search" placeholder={t.search.placeholder} defaultValue={values.q} />
       </div>
       <div className="field">
-        <label htmlFor="month">Сар</label>
+        <label htmlFor="month">{t.search.month}</label>
         <select id="month" name="month" defaultValue={values.month ?? ""}>
-          <option value="">Бүх сар</option>
+          <option value="">{t.search.anyMonth}</option>
           {MONTHS.map((m) => (
-            <option key={m.v} value={m.v}>
-              {m.l}
+            <option key={m} value={m}>
+              {t.search.monthName(m)}
             </option>
           ))}
         </select>
       </div>
       <div className="field">
-        <label htmlFor="budget">Төсөв</label>
+        <label htmlFor="budget">{t.search.budget}</label>
         <select id="budget" name="budget" defaultValue={values.budget ?? ""}>
-          <option value="">Хязгааргүй</option>
+          <option value="">{t.search.anyBudget}</option>
           {BUDGETS.map((b) => (
-            <option key={b.v} value={b.v}>
-              {b.l}
+            <option key={b} value={b}>
+              {t.search.budgetUpTo(budgetMillions(b))}
             </option>
           ))}
         </select>
@@ -48,7 +43,7 @@ export function SearchForm({ values = {}, compact = false }: { values?: Filter; 
       {values.kind && <input type="hidden" name="kind" value={values.kind} />}
       {values.sort && <input type="hidden" name="sort" value={values.sort} />}
       <button className="btn search-btn" type="submit">
-        <SearchIcon /> Хайх
+        <SearchIcon /> {t.search.submit}
       </button>
     </Form>
   );

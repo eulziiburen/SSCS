@@ -28,6 +28,10 @@ export function TourForm({ tour: t }: { tour?: Tour }) {
     upcoming: on(t?.upcoming),
     featured: on(t?.featured),
     heroEyebrow: t?.heroEyebrow ?? "",
+    titleEn: t?.titleEn ?? "",
+    countryEn: t?.countryEn ?? "",
+    routeEn: t?.routeEn.join("\n") ?? "",
+    heroEyebrowEn: t?.heroEyebrowEn ?? "",
   };
 
   return (
@@ -127,6 +131,31 @@ export function TourForm({ tour: t }: { tour?: Tour }) {
           <div className="field">
             <label htmlFor="heroEyebrow">Slider дээрх жижиг бичиг</label>
             <input id="heroEyebrow" name="heroEyebrow" defaultValue={d.heroEyebrow} placeholder="Жишээ: Үлдэгдэл 2 суудал" />
+          </div>
+        </section>
+
+        <section className="a-card">
+          <div>
+            <h2>English</h2>
+            <p className="a-hint">Сайтыг EN хэлээр үзэхэд харагдана. Хоосон үлдээвэл монгол текст гарна.</p>
+          </div>
+          <div className="field">
+            <label htmlFor="titleEn">Title</label>
+            <input id="titleEn" name="titleEn" lang="en" defaultValue={d.titleEn} maxLength={160} />
+          </div>
+          <div className="a-grid3">
+            <div className="field">
+              <label htmlFor="countryEn">Destination</label>
+              <input id="countryEn" name="countryEn" lang="en" defaultValue={d.countryEn} placeholder="China" />
+            </div>
+            <div className="field a-span2">
+              <label htmlFor="heroEyebrowEn">Slider label</label>
+              <input id="heroEyebrowEn" name="heroEyebrowEn" lang="en" defaultValue={d.heroEyebrowEn} placeholder="e.g. Only 2 seats left" />
+            </div>
+          </div>
+          <div className="field">
+            <label htmlFor="routeEn">Route — one stop per line, same order as Mongolian</label>
+            <textarea id="routeEn" name="routeEn" lang="en" rows={4} defaultValue={d.routeEn} />
           </div>
         </section>
 

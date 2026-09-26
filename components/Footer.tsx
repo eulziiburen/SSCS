@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { getI18n } from "@/lib/locale";
 import { Logo } from "./Icons";
 
-export function Footer() {
+export async function Footer() {
+  const { t } = await getI18n();
   return (
     <footer id="contact" className="site-foot">
       <div className="wrap">
@@ -10,29 +12,29 @@ export function Footer() {
             <div className="logo">
               <Logo tone="dark" height={28} />
             </div>
-            <p>Монгол орон болон дэлхийн өнцөг булан бүрээр тухтай, найдвартай аялуулна.</p>
+            <p>{t.footer.tagline}</p>
           </div>
           <div>
-            <h4>Цэс</h4>
+            <h4>{t.footer.menu}</h4>
             <ul>
-              <li><Link href="/tours">Бүх аялал</Link></li>
-              <li><Link href="/tours?kind=abroad">Гадаад аялал</Link></li>
-              <li><Link href="/tours?kind=local">Дотоод аялал</Link></li>
-              <li><Link href="/tours?kind=day">Өдрийн аялал</Link></li>
-              <li><Link href="/#news">Мэдээ</Link></li>
+              <li><Link href="/tours">{t.home.allTours}</Link></li>
+              <li><Link href="/tours?kind=abroad">{t.kind.abroad}</Link></li>
+              <li><Link href="/tours?kind=local">{t.kind.local}</Link></li>
+              <li><Link href="/tours?kind=day">{t.kind.day}</Link></li>
+              <li><Link href="/#news">{t.nav.news}</Link></li>
             </ul>
           </div>
           <div>
-            <h4>Холбоо барих</h4>
+            <h4>{t.footer.contact}</h4>
             <ul>
               <li><a href="tel:+97670000000">(+976) 7000-0000</a></li>
               <li><a href="mailto:info@sscs.mn">info@sscs.mn</a></li>
-              <li>Улаанбаатар, Сүхбаатар дүүрэг, 1-р хороо, Төв цамхаг 8 давхар</li>
-              <li>Даваа–Баасан 09:00–18:00</li>
+              <li>{t.footer.address}</li>
+              <li>{t.footer.hours}</li>
             </ul>
           </div>
         </div>
-        <div className="copy">© 2026 Soft Travel. Бүх эрх хуулиар хамгаалагдсан.</div>
+        <div className="copy">© 2026 Soft Travel. {t.footer.rights}</div>
       </div>
     </footer>
   );

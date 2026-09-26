@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState, us
 import { createBooking } from "@/app/actions";
 import { dateRange, fmt, VOUCHER_AMOUNTS, VOUCHER_PRICE, type Tour } from "@/lib/data";
 import { CheckIcon, XIcon } from "./Icons";
+import { useI18n } from "./LocaleProvider";
 
 export type BookableTour = Pick<Tour, "id" | "title" | "startDate" | "endDate" | "seats" | "price">;
 
@@ -77,6 +78,8 @@ export function BookingProvider({ children }: { children: ReactNode }) {
 
 function BookingForm({ target, onClose }: { target: Target; onClose: () => void }) {
   const isVoucher = target.type === "voucher";
+  const { locale, t } = useI18n();
+  const b = t.booking;
   const maxPax = isVoucher ? 10 : Math.max(1, target.tour.seats);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -89,8 +92,8 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
   const [pending, startTransition] = useTransition();
 
   const digits = phone.replace(/\D/g, "");
-  const nameErr = touched && !name.trim() ? "Овог, нэрээ оруулна уу." : null;
-  const phoneErr = touched && digits.length !== 8 ? "8 оронтой утасны дугаар оруулна уу." : null;
+  const nameErr = touched && !name.trim() ? b.nameError : null;
+  const phoneErr = touched && digits.length !== 8 ? b.phoneError : null;
   const unit = isVoucher ? amount : target.tour.price;
   const total = unit * pax;
 
@@ -102,12 +105,12 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
     startTransition(async () => {
       try {
         const res = await createBooking(
-          target.type === "voucher" ? { type: "voucher", amount, name, phone, pax } : { type: "tour", tourId: target.tour.id, name, phone, pax },
+          target.type === "voucher" ? { type: "voucher", amount, name, phone, pax, locale } : { type: "tour", tourId: target.tour.id, name, phone, pax, locale },
         );
         if (res.ok) setCode(res.code);
         else setServerErr(res.error);
       } catch {
-        setServerErr("Холболтын алдаа гарлаа. Дахин оролдоно уу.");
+        setServerErr(b.networkError);
       }
     });
   }
@@ -118,13 +121,12 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
         <span className="ok-icon">
           <CheckIcon width={28} height={28} />
         </span>
-        <h3 id="dlg-title">Хүсэлт бүртгэгдлээ</h3>
+        <h3 id="dlg-title">{b.doneTitle}</h3>
         <p>
-          Баярлалаа, {name.trim()}! Манай менежер ажлын 1 өдрийн дотор <strong>{phone}</strong> дугаарт холбогдож төлбөрийн нөхцөлийг
-          танилцуулна.
+          {b.doneText(name.trim())} <strong>{phone}</strong> {b.doneText2}
         </p>
         <div className="sum">
-          <span>Захиалгын дугаар</span>
+          <span>{b.code}</span>
           <button
             type="button"
             className="code"
@@ -132,11 +134,11 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
               navigator.clipboard?.writeText(code).then(() => setCopied(true), () => {});
             }}
           >
-            {code} · {copied ? "хуулсан" : "хуулах"}
+            {code} · {copied ? b.copied : b.copy}
           </button>
         </div>
         <button type="button" className="btn" onClick={onClose} autoFocus>
-          Хаах
+          {b.close}
         </button>
       </div>
     );
@@ -145,15 +147,15 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
   return (
     <form className="dlg-body" onSubmit={submit} noValidate>
       <div className="dlg-head">
-        <h3 id="dlg-title">{isVoucher ? "Эрхийн бичиг захиалах" : "Аялал захиалах"}</h3>
-        <button type="button" className="icon-btn" onClick={onClose} aria-label="Хаах">
+        <h3 id="dlg-title">{isVoucher ? b.voucherTitle : b.tourTitle}</h3>
+        <button type="button" className="icon-btn" onClick={onClose} aria-label={b.close}>
           <XIcon />
         </button>
       </div>
 
       {isVoucher ? (
         <fieldset className="field">
-          <legend>Дүн</legend>
+          <legend>{b.amount}</legend>
           <div className="chips">
             {VOUCHER_AMOUNTS.map((a) => (
               <button type="button" key={a} className="chip" aria-pressed={amount === a} onClick={() => setAmount(a)}>
@@ -170,11 +172,11 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
       )}
 
       <div className="field">
-        <label htmlFor="b-name">Овог, нэр</label>
+        <label htmlFor="b-name">{b.name}</label>
         <input
           id="b-name"
           autoComplete="name"
-          placeholder="Бат-Эрдэнэ"
+          placeholder={b.namePlaceholder}
           value={name}
           onChange={(e) => setName(e.target.value)}
           aria-invalid={!!nameErr}
@@ -190,7 +192,7 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
 
       <div className="row">
         <div className="field">
-          <label htmlFor="b-phone">Утас</label>
+          <label htmlFor="b-phone">{b.phone}</label>
           <input
             id="b-phone"
             inputMode="tel"
@@ -209,18 +211,18 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
         </div>
         <div className="field">
           <span className="label" id="b-pax-label">
-            {isVoucher ? "Тоо ширхэг" : "Хүний тоо"}
+            {isVoucher ? b.quantity : b.people}
           </span>
           <div className="stepper" role="group" aria-labelledby="b-pax-label">
-            <button type="button" onClick={() => setPax((p) => Math.max(1, p - 1))} disabled={pax <= 1} aria-label="Хасах">
+            <button type="button" onClick={() => setPax((p) => Math.max(1, p - 1))} disabled={pax <= 1} aria-label={b.minus}>
               −
             </button>
             <output aria-live="polite">{pax}</output>
-            <button type="button" onClick={() => setPax((p) => Math.min(maxPax, p + 1))} disabled={pax >= maxPax} aria-label="Нэмэх">
+            <button type="button" onClick={() => setPax((p) => Math.min(maxPax, p + 1))} disabled={pax >= maxPax} aria-label={b.plus}>
               +
             </button>
           </div>
-          {!isVoucher && pax >= maxPax && <span className="hint">Үлдэгдэл {maxPax} суудал</span>}
+          {!isVoucher && pax >= maxPax && <span className="hint">{b.seatsLeft(maxPax)}</span>}
         </div>
       </div>
 
@@ -239,13 +241,13 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
 
       <div className="actions">
         <button type="button" className="btn ghost" onClick={onClose}>
-          Болих
+          {b.cancel}
         </button>
         <button type="submit" className="btn" disabled={pending}>
-          {pending ? "Илгээж байна…" : "Хүсэлт илгээх"}
+          {pending ? b.sending : b.submit}
         </button>
       </div>
-      <p className="fine">Одоо төлбөр төлөхгүй. Менежер холбогдож баталгаажуулна.</p>
+      <p className="fine">{b.noPayment}</p>
     </form>
   );
 }

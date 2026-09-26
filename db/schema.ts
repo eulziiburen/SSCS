@@ -6,6 +6,10 @@ export const tours = sqliteTable("tours", {
   scene: text("scene").notNull(),
   country: text("country").notNull(),
   title: text("title").notNull(),
+  titleEn: text("title_en"),
+  countryEn: text("country_en"),
+  routeEn: text("route_en"), // JSON string[]
+  heroEyebrowEn: text("hero_eyebrow_en"),
   startDate: text("start_date").notNull(), // YYYY-MM-DD
   endDate: text("end_date").notNull(), // YYYY-MM-DD
   seats: integer("seats").notNull(),
@@ -40,6 +44,8 @@ export const news = sqliteTable("news", {
   date: text("date").notNull(), // YYYY-MM-DD
   title: text("title").notNull(),
   text: text("text").notNull(),
+  titleEn: text("title_en"),
+  textEn: text("text_en"),
   published: integer("published", { mode: "boolean" }).notNull().default(true),
 });
 
