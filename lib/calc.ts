@@ -3,7 +3,7 @@
 
 import type { Kind } from "./data";
 
-export const CURRENCIES = ["USD", "EUR", "CNY", "KRW", "RUB"] as const;
+export const CURRENCIES = ["USD", "EUR", "CNY", "KRW", "JPY"] as const;
 export type Currency = (typeof CURRENCIES)[number];
 
 export const ADDONS = ["sim", "insurance", "guide", "photo"] as const;
@@ -29,7 +29,7 @@ export const DEFAULT_CALC: CalcSettings = {
   childPercent: 80,
   singlePerNight: 90000,
   addons: { sim: 35000, insurance: 5000, guide: 150000, photo: 250000 },
-  rates: { USD: 3450, EUR: 3850, CNY: 480, KRW: 2.5, RUB: 38 },
+  rates: { USD: 3450, EUR: 3850, CNY: 480, KRW: 2.5, JPY: 23 },
   ratesDate: "2026-09-27",
 };
 
@@ -90,7 +90,7 @@ export function convert(mnt: number, currency: Currency, s: CalcSettings) {
 }
 
 export function fmtCurrency(value: number, currency: Currency) {
-  return value.toLocaleString("en-US", { style: "currency", currency, maximumFractionDigits: currency === "KRW" ? 0 : 2 });
+  return value.toLocaleString("en-US", { style: "currency", currency, maximumFractionDigits: currency === "KRW" || currency === "JPY" ? 0 : 2 });
 }
 
 // Merges stored settings over the defaults so a partial or older record still works
