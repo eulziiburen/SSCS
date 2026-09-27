@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { VoucherButton } from "@/components/Booking";
 import { HeroSlider } from "@/components/HeroSlider";
+import { ReviewButton } from "@/components/ReviewForm";
 import { ArrowIcon } from "@/components/Icons";
 import { SearchForm } from "@/components/SearchForm";
 import { Tabs } from "@/components/Tabs";
 import { TourCard } from "@/components/TourCard";
 import { dotDate, fmt, localizeNews, localizeTour, VOUCHER_PRICE, type Kind } from "@/lib/data";
 import { getI18n } from "@/lib/locale";
-import { getHomeStats, getNews, getTours } from "@/lib/queries";
+import { getHomeStats, getNews, getReviews, getTours } from "@/lib/queries";
 
 const KINDS: Kind[] = ["abroad", "local", "day"];
 
@@ -20,7 +21,14 @@ const SERVICE_ICONS = [
 ];
 
 export default async function Home() {
-  const [{ locale, t }, rawTours, rawNews, stats] = await Promise.all([getI18n(), getTours(), getNews(), getHomeStats()]);
+  const [{ locale, t }, rawTours, rawNews, stats, approved] = await Promise.all([getI18n(), getTours(), getNews(), getHomeStats(), getReviews()]);
+  // Until travelers have posted their own, the original sample reviews keep the section from looking empty
+  const reviews = approved.length
+    ? approved.slice(0, 6).map((r) => ({ key: String(r.id), name: r.name, trip: r.trip ?? "", text: r.text, rating: r.rating }))
+    : t.home.reviewList.map(([name, trip, text]) => ({ key: name, name, trip, text, rating: 5 }));
+  const reviewsLead = approved.length
+    ? t.review.lead2((approved.reduce((sum, r) => sum + r.rating, 0) / approved.length).toFixed(1), approved.length)
+    : t.home.reviewsLead;
   const tours = rawTours.map((x) => localizeTour(x, locale));
   const news = rawNews.map((x) => localizeNews(x, locale));
   const upcoming = tours.filter((x) => x.upcoming);
@@ -138,25 +146,29 @@ export default async function Home() {
         <div className="head">
           <div>
             <h2 id="rev-h">{t.home.reviews}</h2>
-            <p>{t.home.reviewsLead}</p>
+            <p>{reviewsLead}</p>
           </div>
         </div>
         <div className="revs">
-          {t.home.reviewList.map(([name, trip, text]) => (
-            <figure className="rev" key={name}>
-              <span className="stars" role="img" aria-label={t.home.stars}>
-                ★★★★★
+          {reviews.map(({ key, name, trip, text, rating }) => (
+            <figure className="rev" key={key}>
+              <span className="stars" role="img" aria-label={t.review.ratingLabel(rating)}>
+                {"★".repeat(rating)}
+                <span className="off">{"★".repeat(5 - rating)}</span>
               </span>
               <blockquote>{text}</blockquote>
               <figcaption className="who">
                 <span className="av">{name[0]}</span>
                 <div>
                   <strong>{name}</strong>
-                  <small>{trip}</small>
+                  {trip && <small>{trip}</small>}
                 </div>
               </figcaption>
             </figure>
           ))}
+        </div>
+        <div className="revs-foot">
+          <ReviewButton />
         </div>
       </section>
 

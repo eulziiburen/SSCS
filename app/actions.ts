@@ -1,8 +1,9 @@
 "use server";
 
+import { and, eq, gte } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db, ensureDb } from "@/db/client";
-import { bookings } from "@/db/schema";
+import { bookings, reviews } from "@/db/schema";
 import { calculate, type CalcInput } from "@/lib/calc";
 import { isEmail, VOUCHER_AMOUNTS } from "@/lib/data";
 import { getDictionary, isLocale, type Locale } from "@/lib/i18n";
@@ -176,4 +177,40 @@ export async function createCustomTrip(input: CustomTripInput): Promise<BookingR
     { type: "custom", tourTitle: `Өөрийн аялал: ${chosen.map((r) => r.name).join(", ")}`, pax: adults + children, unitPrice: 0, total: 0, details },
     input.locale,
   );
+}
+
+export type ReviewState = { ok: true } | { ok: false; error: string; values: Record<string, string> } | null;
+
+// Reviews wait as "pending" until an admin approves them, so nothing a visitor types goes live on its own
+export async function submitReview(_prev: ReviewState, fd: FormData): Promise<ReviewState> {
+  const locale = isLocale(fd.get("locale")) ? (fd.get("locale") as Locale) : "mn";
+  const t = getDictionary(locale);
+  const get = (k: string) => String(fd.get(k) ?? "").trim();
+  const values = { name: get("name"), email: get("email").toLowerCase(), trip: get("trip"), rating: get("rating"), text: get("text") };
+  const fail = (error: string): ReviewState => ({ ok: false, error, values });
+
+  // Bots fill every field, people never see this one
+  if (get("website")) return { ok: true };
+  if (!values.name || values.name.length > 60) return fail(t.review.errName);
+  if (!isEmail(values.email)) return fail(t.errors.email);
+  const rating = Math.floor(Number(values.rating));
+  if (!(rating >= 1 && rating <= 5)) return fail(t.review.errRating);
+  if (values.text.length < 10 || values.text.length > 1000) return fail(t.review.errText);
+
+  await ensureDb();
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const recent = await db.select({ id: reviews.id }).from(reviews).where(and(eq(reviews.email, values.email), gte(reviews.createdAt, since)));
+  if (recent.length) return fail(t.review.errTooMany);
+
+  await db.insert(reviews).values({
+    name: values.name,
+    email: values.email,
+    trip: values.trip.slice(0, 80) || null,
+    rating,
+    text: values.text,
+    locale,
+    createdAt: new Date().toISOString(),
+  });
+  revalidatePath("/admin", "layout");
+  return { ok: true };
 }

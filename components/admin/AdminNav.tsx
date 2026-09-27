@@ -10,11 +10,12 @@ const ITEMS = [
   { href: "/admin/hotels", label: "Зочид буудал" },
   { href: "/admin/regions", label: "Монгол орон" },
   { href: "/admin/news", label: "Мэдээ" },
+  { href: "/admin/reviews", label: "Сэтгэгдэл" },
   { href: "/admin/home", label: "Нүүр хуудас" },
   { href: "/admin/settings", label: "Тооцоолуур" },
 ];
 
-export function AdminNav({ newCount }: { newCount: number }) {
+export function AdminNav({ newCount, pendingReviews }: { newCount: number; pendingReviews: number }) {
   const pathname = usePathname();
   return (
     <nav className="a-nav" aria-label="Admin цэс">
@@ -24,6 +25,7 @@ export function AdminNav({ newCount }: { newCount: number }) {
           <Link key={i.href} href={i.href} aria-current={active ? "page" : undefined}>
             {i.label}
             {i.href === "/admin/bookings" && newCount > 0 && <span className="a-count">{newCount}</span>}
+            {i.href === "/admin/reviews" && pendingReviews > 0 && <span className="a-count">{pendingReviews}</span>}
           </Link>
         );
       })}

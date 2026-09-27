@@ -4,14 +4,16 @@ import { redirect } from "next/navigation";
 import { Logo } from "@/components/Icons";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { isAuthenticated } from "@/lib/auth";
-import { getBookings } from "@/lib/queries";
+import { getBookings, getReviews } from "@/lib/queries";
 import { logout } from "../actions";
 
 export const metadata: Metadata = { title: { default: "Admin", template: "%s · Admin" }, robots: { index: false } };
 
 export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
   if (!(await isAuthenticated())) redirect("/admin/login");
-  const newCount = (await getBookings()).filter((b) => b.status === "new").length;
+  const [allBookings, allReviews] = await Promise.all([getBookings(), getReviews({ approvedOnly: false })]);
+  const newCount = allBookings.filter((b) => b.status === "new").length;
+  const pendingReviews = allReviews.filter((r) => r.status === "pending").length;
 
   return (
     <div className="admin">
@@ -20,7 +22,7 @@ export default async function PanelLayout({ children }: LayoutProps<"/admin">) {
           <Link href="/admin" className="logo">
             <Logo height={24} /> <span className="a-tag">Admin</span>
           </Link>
-          <AdminNav newCount={newCount} />
+          <AdminNav newCount={newCount} pendingReviews={pendingReviews} />
           <div className="a-top-end">
             <Link href="/" className="a-link" target="_blank">
               Сайт руу ↗

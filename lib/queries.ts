@@ -1,6 +1,6 @@
 import { asc, desc, eq } from "drizzle-orm";
 import { db, ensureDb } from "@/db/client";
-import { bookings, hotels, news, regions, settings, tours, type HotelRow, type RegionRow, type TourRow } from "@/db/schema";
+import { bookings, hotels, news, regions, reviews, settings, tours, type HotelRow, type RegionRow, type TourRow } from "@/db/schema";
 import { HOTEL_AMENITIES, HOTEL_CATEGORIES, lines, type Hotel, type HotelAmenity, type HotelCategory, type Region } from "./places";
 import { mergeCalc, type CalcSettings } from "./calc";
 import { mergeStats, type Stat } from "./stats";
@@ -105,4 +105,13 @@ export async function getHotel(id: number): Promise<Hotel | undefined> {
   await ensureDb();
   const [row] = await db.select().from(hotels).where(eq(hotels.id, id));
   return row ? toHotel(row) : undefined;
+}
+
+export async function getReviews({ approvedOnly = true } = {}) {
+  await ensureDb();
+  return db
+    .select()
+    .from(reviews)
+    .where(approvedOnly ? eq(reviews.status, "approved") : undefined)
+    .orderBy(desc(reviews.createdAt));
 }

@@ -97,6 +97,19 @@ export const hotels = sqliteTable("hotels", {
   published: integer("published", { mode: "boolean" }).notNull().default(true),
 });
 
+// Traveler-submitted reviews; shown on the site only after an admin approves them
+export const reviews = sqliteTable("reviews", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  email: text("email").notNull(), // never shown publicly
+  trip: text("trip"),
+  rating: integer("rating").notNull(), // 1–5
+  text: text("text").notNull(),
+  locale: text("locale").notNull().default("mn"),
+  status: text("status", { enum: ["pending", "approved", "hidden"] }).notNull().default("pending"),
+  createdAt: text("created_at").notNull(),
+});
+
 export const settings = sqliteTable("settings", {
   key: text("key").primaryKey(),
   value: text("value").notNull(), // JSON
@@ -107,3 +120,4 @@ export type BookingRow = typeof bookings.$inferSelect;
 export type NewsRow = typeof news.$inferSelect;
 export type RegionRow = typeof regions.$inferSelect;
 export type HotelRow = typeof hotels.$inferSelect;
+export type ReviewRow = typeof reviews.$inferSelect;

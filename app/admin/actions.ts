@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db, ensureDb } from "@/db/client";
-import { bookings, hotels, images, news, regions, settings, tours } from "@/db/schema";
+import { bookings, hotels, images, news, regions, reviews, settings, tours } from "@/db/schema";
 import { HOTEL_AMENITIES, HOTEL_CATEGORIES } from "@/lib/places";
 import { ADDONS, CURRENCIES, mergeCalc } from "@/lib/calc";
 import { MAX_STATS, mergeStats } from "@/lib/stats";
@@ -342,4 +342,22 @@ export async function saveRegion(fd: FormData) {
   await dropReplacedImage(existing.imageId, imageId);
   refreshSite();
   redirect("/admin/regions?saved=1");
+}
+
+/* ---------- reviews ---------- */
+
+const REVIEW_STATUS = ["pending", "approved", "hidden"] as const;
+
+export async function setReviewStatus(fd: FormData) {
+  await requireAuth();
+  const status = str(fd, "status");
+  if (!(REVIEW_STATUS as readonly string[]).includes(status)) return;
+  await db.update(reviews).set({ status: status as (typeof REVIEW_STATUS)[number] }).where(eq(reviews.id, Number(fd.get("id"))));
+  refreshSite();
+}
+
+export async function deleteReview(fd: FormData) {
+  await requireAuth();
+  await db.delete(reviews).where(eq(reviews.id, Number(fd.get("id"))));
+  refreshSite();
 }
