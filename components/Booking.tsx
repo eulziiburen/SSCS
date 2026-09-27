@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState, us
 import { createBooking } from "@/app/actions";
 import { dateRange, fmt, isEmail, isVoucherAmount, VOUCHER_AMOUNTS, VOUCHER_MAX, VOUCHER_MIN, VOUCHER_PRICE, type Tour } from "@/lib/data";
 import { DEFAULT_DIAL, formatPhone, isValidPhone } from "@/lib/phone";
+import { CurrencyApprox } from "./CurrencyApprox";
 import { CheckIcon, XIcon } from "./Icons";
 import { useI18n } from "./LocaleProvider";
 import { NameFields } from "./NameFields";
@@ -252,6 +253,7 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
           {fmt(unit)} × {pax}
         </span>
         <strong>{fmt(total)}</strong>
+        {total > 0 && <CurrencyApprox id="b-fx" mnt={total} />}
       </div>
 
       {serverErr && (

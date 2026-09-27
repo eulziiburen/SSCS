@@ -85,7 +85,7 @@ export function calculate(tour: CalcTour, raw: Partial<CalcInput>, s: CalcSettin
   return { input, lines, travelers, total, perPerson: Math.round(total / travelers), overSeats: travelers > tour.seats };
 }
 
-export function convert(mnt: number, currency: Currency, s: CalcSettings) {
+export function convert(mnt: number, currency: Currency, s: Pick<CalcSettings, "rates">) {
   return mnt / s.rates[currency];
 }
 

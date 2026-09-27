@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createHotelBooking } from "@/app/actions";
 import { fmt } from "@/lib/data";
 import { ContactForm } from "./ContactForm";
+import { CurrencyApprox } from "./CurrencyApprox";
 import { useI18n } from "./LocaleProvider";
 
 function Counter({ id, label, value, min, max, onChange }: { id: string; label: string; value: number; min: number; max: number; onChange: (v: number) => void }) {
@@ -50,6 +51,7 @@ export function HotelBooking({ hotelId, price, today }: { hotelId: number; price
       <div className="sum total">
         <span>{h.total(nights, rooms)}</span>
         <strong>{fmt(total)}</strong>
+        {total > 0 && <CurrencyApprox id="hb-fx" mnt={total} />}
       </div>
       <ContactForm
         idPrefix="hb"
