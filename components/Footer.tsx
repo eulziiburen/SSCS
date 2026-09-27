@@ -16,11 +16,13 @@ export async function Footer() {
           </div>
           <div>
             <h4>{t.footer.menu}</h4>
-            <ul>
-              <li><Link href="/tours">{t.home.allTours}</Link></li>
-              <li><Link href="/tours?kind=abroad">{t.kind.abroad}</Link></li>
-              <li><Link href="/tours?kind=local">{t.kind.local}</Link></li>
-              <li><Link href="/tours?kind=day">{t.kind.day}</Link></li>
+            <p className="foot-tours">
+              <Link href="/tours">{t.nav.tours}:</Link>{" "}
+              <Link href="/tours?kind=abroad">{t.kind.abroad}</Link> ·{" "}
+              <Link href="/tours?kind=local">{t.kind.local}</Link> ·{" "}
+              <Link href="/tours?kind=day">{t.kind.day}</Link>
+            </p>
+            <ul className="foot-menu">
               <li><Link href="/plan">{t.nav.plan}</Link></li>
               <li><Link href="/mongolia">{t.nav.mongolia}</Link></li>
               <li><Link href="/hotels">{t.nav.hotels}</Link></li>

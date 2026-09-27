@@ -298,6 +298,9 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .site-foot p { max-width: 40ch; }
 .site-foot h4 { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #ffd08a; margin: 0 0 12px; }
 .site-foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.site-foot .foot-tours { margin: 0 0 10px; }
+.site-foot .foot-tours a:first-child { font-weight: 700; color: #fff; }
+.site-foot .foot-menu { grid-template-columns: repeat(2, max-content); column-gap: 24px; }
 .site-foot a { text-decoration: none; }
 .site-foot a:hover { color: #fff; text-decoration: underline; }
 .site-foot .logo { color: #fff; margin-bottom: 10px; }
