@@ -3,9 +3,9 @@
   --sky: #2346e0; --sky-deep: #0f1a33; --saffron: #ff7a2f; --saffron-ink: #1b0d04; --grass: #3f8a4a; --danger: #c73a27;
   --ink: #0f1a33; --muted: #55607a; --bg: #f4f6fb; --surface: #ffffff; --line: #dde3ef;
   --chip: #e8edfb; --shadow: 0 10px 30px rgba(15, 26, 51, 0.1); --shadow-sm: 0 1px 3px rgba(15, 26, 51, 0.08);
-  --display: var(--font-display), "Arial Black", system-ui, sans-serif;
-  --body: var(--font-body), system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: var(--font-mono), ui-monospace, Consolas, monospace;
+  --display: var(--font-noto), system-ui, sans-serif;
+  --body: var(--font-noto), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: var(--font-noto), system-ui, sans-serif;
   --radius: 16px;
   --header-h: 64px;
 }

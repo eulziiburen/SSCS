@@ -1,12 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { JetBrains_Mono, Manrope, Unbounded } from "next/font/google";
+import { Noto_Sans } from "next/font/google";
 import { LocaleProvider } from "@/components/LocaleProvider";
 import { getI18n } from "@/lib/locale";
 import "./globals.css";
 
-const display = Unbounded({ subsets: ["latin", "cyrillic"], weight: ["500", "700", "800"], variable: "--font-display" });
-const body = Manrope({ subsets: ["latin", "cyrillic"], variable: "--font-body" });
-const mono = JetBrains_Mono({ subsets: ["latin", "cyrillic"], weight: ["500", "700"], variable: "--font-mono" });
+// Same typeface as totti.mn, used for headings, body and figures alike.
+const noto = Noto_Sans({ subsets: ["latin", "cyrillic"], weight: ["300", "400", "500", "600", "700", "800"], variable: "--font-noto" });
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
@@ -31,7 +30,7 @@ const THEME_SCRIPT = `(function(){var p="system";try{p=localStorage.getItem("the
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { locale, t } = await getI18n();
   return (
-    <html lang={locale} className={`${display.variable} ${body.variable} ${mono.variable}`} suppressHydrationWarning>
+    <html lang={locale} className={noto.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
