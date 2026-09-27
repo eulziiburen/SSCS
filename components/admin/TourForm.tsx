@@ -1,17 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
 import { deleteTour, saveTour } from "@/app/admin/actions";
 import { KIND_LABEL, SCENE_KEYS, SCENE_LABEL, type Tour } from "@/lib/data";
 import { imageUrl } from "../TourVisual";
 import { ConfirmButton, SubmitButton } from "./Controls";
+import { useFormAction } from "./useFormAction";
 import { ImageField } from "./ImageField";
 
 const on = (b: boolean | undefined) => (b ? "on" : "");
 
 export function TourForm({ tour: t }: { tour?: Tour }) {
-  const [state, action] = useActionState(saveTour, null);
+  const { state, action, key } = useFormAction(saveTour);
 
   // After a failed save the submitted values win, so nothing the admin typed is lost
   const d: Record<string, string> = state?.values ?? {
@@ -43,7 +43,7 @@ export function TourForm({ tour: t }: { tour?: Tour }) {
           {state.error}
         </p>
       )}
-      <form action={action} className="a-form">
+      <form action={action} className="a-form" key={key}>
         {t && <input type="hidden" name="id" value={t.id} />}
 
         <section className="a-card">

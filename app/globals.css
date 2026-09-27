@@ -522,3 +522,75 @@ img.art.photo { object-fit: cover; }
 /* surname + given name side by side, stacked on narrow phones */
 .name-row { grid-template-columns: 1fr 1fr; }
 @media (max-width: 360px) { .name-row { grid-template-columns: 1fr; } }
+
+.a-type { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; padding: 2px 7px; border-radius: 6px; background: var(--chip); color: var(--muted); vertical-align: 1px; }
+.a-type.t-hotel { background: color-mix(in srgb, var(--sky) 15%, transparent); color: var(--sky); }
+.a-type.t-custom { background: color-mix(in srgb, var(--saffron) 20%, transparent); color: var(--ink); }
+
+/* ================= Mongolia map ================= */
+.mn-map { position: relative; }
+.mn-map svg { display: block; width: 100%; height: auto; }
+.mn-region { fill: color-mix(in srgb, var(--sky) 14%, var(--surface)); stroke: var(--surface); stroke-width: 1.4; cursor: pointer; transition: fill 0.15s; outline: none; }
+.mn-region:hover, .mn-region.hover { fill: color-mix(in srgb, var(--sky) 32%, var(--surface)); }
+.mn-region.on { fill: var(--sky); }
+.mn-region:focus-visible { stroke: var(--saffron); stroke-width: 3; }
+.mn-label { font: 700 16px var(--body); fill: var(--ink); text-anchor: middle; pointer-events: none; paint-order: stroke; stroke: color-mix(in srgb, var(--surface) 70%, transparent); stroke-width: 3px; }
+.mn-dot { pointer-events: none; }
+.mn-dot circle { fill: var(--saffron); stroke: var(--surface); stroke-width: 1.5; }
+.mn-dot text { font: 800 12px var(--body); fill: var(--ink); text-anchor: middle; paint-order: stroke; stroke: var(--surface); stroke-width: 3px; }
+.mn-hover { margin: 6px 0 0; min-height: 1.4em; font-weight: 700; color: var(--sky); text-align: center; }
+.mn-label.on { fill: #fff; stroke: color-mix(in srgb, var(--sky) 60%, transparent); }
+.mn-dot text { font-size: 15px; }
+@media (max-width: 640px) { .mn-label { font-size: 22px; } }
+
+.explore { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.explore-map { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+.map-attr { text-align: left; margin: 4px 0 12px; }
+.region-chips { max-height: 220px; overflow: auto; }
+.region-chips .chip { font-size: 13px; padding: 6px 12px; border: 0; cursor: pointer; }
+.region-chips .chip[aria-pressed="true"] { background: var(--sky); color: #fff; }
+.region-panel { position: sticky; top: calc(var(--header-h) + 20px); background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; scroll-margin-top: calc(var(--header-h) + 12px); }
+.region-panel h2 { font-size: 24px; }
+.region-panel h3 { font-family: var(--body); font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-top: 8px; }
+.region-photo { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 12px; }
+.region-center { color: var(--muted); font-family: var(--mono); font-size: 13px; }
+.region-summary { font-weight: 600; }
+.region-sights { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.region-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.region-empty { color: var(--muted); text-align: center; padding: 40px 10px; }
+@media (max-width: 960px) { .explore { grid-template-columns: 1fr; } .region-panel { position: static; } }
+
+/* ================= hotels ================= */
+.hotel-filter { grid-template-columns: repeat(5, 1fr) auto; }
+@media (max-width: 1000px) { .hotel-filter { grid-template-columns: 1fr 1fr 1fr; } .hotel-filter .search-btn { grid-column: auto; } }
+@media (max-width: 560px) { .hotel-filter { grid-template-columns: 1fr 1fr; } .hotel-filter .search-btn { grid-column: 1 / -1; } }
+svg.hotel-ph rect { fill: color-mix(in srgb, var(--sky) 18%, var(--chip)); }
+svg.hotel-ph path { stroke: color-mix(in srgb, var(--sky) 60%, var(--surface)); }
+.badge.static-top { top: 12px; left: 12px; background: var(--surface); color: var(--ink); }
+.hotel-card .stars { font-size: 14px; }
+.stars.big { font-size: 20px; color: #ffd08a; }
+.amenity-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.amenity-list li { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--chip); color: var(--muted); display: inline-flex; align-items: center; gap: 5px; }
+.amenity-list.big li { font-size: 14px; padding: 6px 12px; color: var(--ink); }
+.hotel-desc { font-size: 16px; line-height: 1.65; white-space: pre-line; }
+.hotel-book { display: flex; flex-direction: column; gap: 12px; }
+.hotel-book h2 { font-family: var(--body); font-size: 16px; font-weight: 800; }
+.row.three { grid-template-columns: repeat(3, 1fr); }
+.row.three .stepper button { width: 34px; }
+@media (max-width: 900px) { .book-panel.hotel-panel { display: flex; position: static; } }
+
+/* ================= trip planner ================= */
+.planner { display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
+.planner-steps { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.planner .explore-map { padding: 0; border: 0; }
+.sight-group { border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.sight-group legend { font-weight: 800; margin-bottom: 8px; }
+.sight-group .calc-addon { grid-template-columns: auto 1fr; }
+.sight-group .calc-addon input { grid-row: auto; }
+.planner .chips .chip { border: 0; cursor: pointer; }
+.calc-lines strong.plain { font-family: var(--body); font-weight: 700; text-align: right; white-space: normal; }
+@media (max-width: 960px) { .planner { grid-template-columns: 1fr; } }
+
+/* admin: MN / EN side by side */
+.a-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 760px) { .a-pair { grid-template-columns: 1fr; } }

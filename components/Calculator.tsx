@@ -1,15 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 import { createBooking } from "@/app/actions";
 import { ADDON_UNIT, ADDONS, addonAvailable, calculate, convert, CURRENCIES, fmtCurrency, type Addon, type CalcSettings, type Currency } from "@/lib/calc";
-import { dateRange, dotDate, fmt, isEmail, type Kind } from "@/lib/data";
-import { DEFAULT_DIAL, formatPhone, isValidPhone } from "@/lib/phone";
-import { CheckIcon } from "./Icons";
+import { dateRange, dotDate, fmt, type Kind } from "@/lib/data";
+import { ContactForm } from "./ContactForm";
 import { useI18n } from "./LocaleProvider";
-import { NameFields } from "./NameFields";
-import { PhoneField } from "./PhoneField";
 
 export type CalcTourOption = { id: number; title: string; price: number; days: number; kind: Kind; seats: number; startDate: string; endDate: string };
 
@@ -178,8 +175,11 @@ export function Calculator({ tours, settings, initialTourId }: { tours: CalcTour
         </div>
         <p className="fine">{c.rateNote(dotDate(settings.ratesDate))}</p>
 
-        <CalcBooking
+        <ContactForm
           key={`${tour.id}`}
+          idPrefix="cb"
+          title={c.bookTitle}
+          disclaimer={c.disclaimer}
           disabled={result.overSeats}
           onSubmit={({ lastName, firstName, phone, dial, email }) =>
             createBooking({ type: "tour", tourId: tour.id, lastName, firstName, phone, dial, email, pax: result.travelers, locale, calc: { adults, children, singleRooms, addons } })
@@ -187,81 +187,6 @@ export function Calculator({ tours, settings, initialTourId }: { tours: CalcTour
         />
       </aside>
     </div>
-  );
-}
-
-type Contact = { lastName: string; firstName: string; phone: string; dial: string; email: string };
-
-function CalcBooking({ disabled, onSubmit }: { disabled: boolean; onSubmit: (c: Contact) => ReturnType<typeof createBooking> }) {
-  const { t } = useI18n();
-  const b = t.booking;
-  const [lastName, setLastName] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [iso, setIso] = useState(DEFAULT_DIAL.iso);
-  const [email, setEmail] = useState("");
-  const [touched, setTouched] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-  const [code, setCode] = useState<string | null>(null);
-  const [pending, start] = useTransition();
-  const phoneOk = isValidPhone(iso, phone);
-  const nameOk = !!lastName.trim() && !!firstName.trim();
-  const phoneErr = touched && !phoneOk ? b.phoneError(iso === "MN") : null;
-  const emailErr = touched && !isEmail(email.trim()) ? b.emailError : null;
-
-  if (code) {
-    return (
-      <div className="calc-done" role="status">
-        <span className="ok-icon">
-          <CheckIcon width={24} height={24} />
-        </span>
-        <strong>{b.doneTitle}</strong>
-        <p>
-          {b.doneText(firstName.trim())} <strong>{formatPhone(iso, phone)}</strong> {b.doneText2}
-        </p>
-        <span className="code">{code}</span>
-      </div>
-    );
-  }
-
-  return (
-    <form
-      className="calc-book"
-      noValidate
-      onSubmit={(e) => {
-        e.preventDefault();
-        setTouched(true);
-        if (!nameOk || !phoneOk || !isEmail(email.trim()) || disabled) return;
-        setErr(null);
-        start(async () => {
-          try {
-            const res = await onSubmit({ lastName, firstName, phone, dial: iso, email });
-            if (res.ok) setCode(res.code);
-            else setErr(res.error);
-          } catch {
-            setErr(b.networkError);
-          }
-        });
-      }}
-    >
-      <h3>{t.calc.bookTitle}</h3>
-      <NameFields idPrefix="cb" lastName={lastName} firstName={firstName} onLastName={setLastName} onFirstName={setFirstName} touched={touched} />
-      <PhoneField id="cb-phone" iso={iso} onIso={setIso} value={phone} onChange={setPhone} error={phoneErr} />
-      <div className="field">
-        <label htmlFor="cb-email">{b.email}</label>
-        <input id="cb-email" type="email" inputMode="email" autoComplete="email" placeholder={b.emailPlaceholder} value={email} onChange={(e) => setEmail(e.target.value)} aria-invalid={!!emailErr} />
-        {emailErr && <span className="err">{emailErr}</span>}
-      </div>
-      {err && (
-        <p className="err" role="alert">
-          {err}
-        </p>
-      )}
-      <button type="submit" className="btn full" disabled={pending || disabled}>
-        {pending ? b.sending : b.submit}
-      </button>
-      <p className="fine">{t.calc.disclaimer}</p>
-    </form>
   );
 }
 

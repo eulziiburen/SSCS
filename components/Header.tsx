@@ -85,10 +85,10 @@ export function Header() {
 
   const nav = [
     { href: "/tours", label: t.nav.tours },
+    { href: "/plan", label: t.nav.plan },
+    { href: "/mongolia", label: t.nav.mongolia },
+    { href: "/hotels", label: t.nav.hotels },
     { href: "/calculator", label: t.nav.calculator },
-    { href: "/#services", label: t.nav.services },
-    { href: "/#news", label: t.nav.news },
-    { href: "/#contact", label: t.nav.contact },
   ];
 
   useEffect(() => setOpen(false), [pathname]);

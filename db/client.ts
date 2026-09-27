@@ -1,6 +1,7 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "./schema";
+import { REGION_SEED } from "./regions-seed";
 import { SEED_NEWS, SEED_NEWS_EN, SEED_TOURS, SEED_TOURS_EN } from "./seed-data";
 
 const url = process.env.TURSO_DATABASE_URL;
@@ -57,6 +58,38 @@ CREATE TABLE IF NOT EXISTS news (
   date TEXT NOT NULL,
   title TEXT NOT NULL,
   text TEXT NOT NULL,
+  published INTEGER NOT NULL DEFAULT 1
+);
+CREATE TABLE IF NOT EXISTS regions (
+  code TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  name_en TEXT NOT NULL,
+  center TEXT NOT NULL,
+  center_en TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  summary_en TEXT NOT NULL,
+  history TEXT NOT NULL,
+  history_en TEXT NOT NULL,
+  culture TEXT NOT NULL,
+  culture_en TEXT NOT NULL,
+  attractions TEXT NOT NULL,
+  attractions_en TEXT NOT NULL,
+  image_id INTEGER
+);
+CREATE TABLE IF NOT EXISTS hotels (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  name_en TEXT,
+  region_code TEXT NOT NULL,
+  city TEXT NOT NULL,
+  city_en TEXT,
+  stars INTEGER NOT NULL DEFAULT 0,
+  category TEXT NOT NULL,
+  price_per_night INTEGER NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  description_en TEXT,
+  amenities TEXT NOT NULL DEFAULT '[]',
+  image_id INTEGER,
   published INTEGER NOT NULL DEFAULT 1
 );
 CREATE TABLE IF NOT EXISTS images (
@@ -117,7 +150,23 @@ async function init() {
   await client.executeMultiple(DDL);
   await migrate();
   await seed();
+  await seedRegions();
   await backfillEnglish();
+}
+
+// Adds any province that's missing; never touches rows an admin has edited
+async function seedRegions() {
+  const { rows } = await client.execute("SELECT code FROM regions");
+  const have = new Set(rows.map((r) => String(r.code)));
+  const missing = REGION_SEED.filter((r) => !have.has(r.code));
+  if (!missing.length) return;
+  await client.batch(
+    missing.map((r) => ({
+      sql: "INSERT OR IGNORE INTO regions (code, name, name_en, center, center_en, summary, summary_en, history, history_en, culture, culture_en, attractions, attractions_en) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+      args: [r.code, r.name, r.nameEn, r.center, r.centerEn, r.summary, r.summaryEn, r.history, r.historyEn, r.culture, r.cultureEn, r.attractions, r.attractionsEn],
+    })),
+    "write",
+  );
 }
 
 async function seed() {

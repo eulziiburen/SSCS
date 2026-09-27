@@ -4,6 +4,8 @@ import type { BookingRow } from "@/db/schema";
 import { BOOKING_STATUS, fmt } from "@/lib/data";
 import { AutoSelect, ConfirmButton } from "./Controls";
 
+const TYPE_LABEL: Record<BookingRow["type"], string> = { tour: "Аялал", voucher: "Эрхийн бичиг", hotel: "Буудал", custom: "Өөрийн аялал" };
+
 const when = (iso: string) => {
   const d = new Date(iso);
   // Admins work in Ulaanbaatar time regardless of where the server runs
@@ -46,10 +48,12 @@ export function BookingTable({ bookings, compact = false }: { bookings: BookingR
                 </small>
               </td>
               <td>
+                <span className={`a-type t-${b.type}`}>{TYPE_LABEL[b.type]}</span>{" "}
                 {b.tourId ? <Link href={`/admin/tours/${b.tourId}`}>{b.tourTitle}</Link> : b.tourTitle}
-                <small>{b.details ? `Тооцоолуур: ${b.details}` : `${b.pax} × ${fmt(b.unitPrice)}`}</small>
+                <small>{b.details ? (b.type === "tour" ? `Тооцоолуур: ${b.details}` : b.details) : `${b.pax} × ${fmt(b.unitPrice)}`}</small>
               </td>
-              <td className="num mono">{fmt(b.total)}</td>
+              {/* Custom trips are priced by the manager afterwards */}
+              <td className="num mono">{b.type === "custom" ? "Тохиролцоно" : fmt(b.total)}</td>
               <td>
                 <form action={setBookingStatus}>
                   <input type="hidden" name="id" value={b.id} />

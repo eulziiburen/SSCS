@@ -27,7 +27,7 @@ export const tours = sqliteTable("tours", {
 export const bookings = sqliteTable("bookings", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   code: text("code").notNull().unique(),
-  type: text("type", { enum: ["tour", "voucher"] }).notNull(),
+  type: text("type", { enum: ["tour", "voucher", "hotel", "custom"] }).notNull(),
   tourId: integer("tour_id"),
   tourTitle: text("tour_title").notNull(),
   name: text("name").notNull(), // "Овог Нэр", kept for display and older rows
@@ -62,6 +62,41 @@ export const images = sqliteTable("images", {
   createdAt: text("created_at").notNull(),
 });
 
+// Provinces for the Mongolia map; code matches lib/mongolia-map.ts
+export const regions = sqliteTable("regions", {
+  code: text("code").primaryKey(),
+  name: text("name").notNull(),
+  nameEn: text("name_en").notNull(),
+  center: text("center").notNull(),
+  centerEn: text("center_en").notNull(),
+  summary: text("summary").notNull(),
+  summaryEn: text("summary_en").notNull(),
+  history: text("history").notNull(),
+  historyEn: text("history_en").notNull(),
+  culture: text("culture").notNull(),
+  cultureEn: text("culture_en").notNull(),
+  attractions: text("attractions").notNull(), // one per line
+  attractionsEn: text("attractions_en").notNull(),
+  imageId: integer("image_id"),
+});
+
+export const hotels = sqliteTable("hotels", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  nameEn: text("name_en"),
+  regionCode: text("region_code").notNull(),
+  city: text("city").notNull(),
+  cityEn: text("city_en"),
+  stars: integer("stars").notNull().default(0), // 0 = unrated
+  category: text("category").notNull(), // see HOTEL_CATEGORIES
+  pricePerNight: integer("price_per_night").notNull(), // ₮ per room
+  description: text("description").notNull().default(""),
+  descriptionEn: text("description_en"),
+  amenities: text("amenities").notNull().default("[]"), // JSON HotelAmenity[]
+  imageId: integer("image_id"),
+  published: integer("published", { mode: "boolean" }).notNull().default(true),
+});
+
 export const settings = sqliteTable("settings", {
   key: text("key").primaryKey(),
   value: text("value").notNull(), // JSON
@@ -70,3 +105,5 @@ export const settings = sqliteTable("settings", {
 export type TourRow = typeof tours.$inferSelect;
 export type BookingRow = typeof bookings.$inferSelect;
 export type NewsRow = typeof news.$inferSelect;
+export type RegionRow = typeof regions.$inferSelect;
+export type HotelRow = typeof hotels.$inferSelect;

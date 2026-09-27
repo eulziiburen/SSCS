@@ -4,7 +4,8 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db, ensureDb } from "@/db/client";
-import { bookings, images, news, settings, tours } from "@/db/schema";
+import { bookings, hotels, images, news, regions, settings, tours } from "@/db/schema";
+import { HOTEL_AMENITIES, HOTEL_CATEGORIES } from "@/lib/places";
 import { ADDONS, CURRENCIES, mergeCalc } from "@/lib/calc";
 import { MAX_STATS, mergeStats } from "@/lib/stats";
 import { checkCredentials, createSession, destroySession, isAuthenticated } from "@/lib/auth";
@@ -94,36 +95,43 @@ export async function saveTour(_prev: TourFormState, fd: FormData): Promise<Tour
   if (route.length < 2) return fail("Маршрутад дор хаяж 2 цэг оруулна уу (мөр бүрт нэг).");
   if (routeEn.length && routeEn.length !== route.length) return fail(`Англи маршрут монголтой ижил тооны цэгтэй байх ёстой (${route.length}).`);
 
-  const upload = fd.get("image");
-  const hasUpload = upload instanceof File && upload.size > 0;
-  if (hasUpload && !IMAGE_TYPES.includes(upload.type)) return fail("Зөвхөн JPG, PNG, WebP зураг оруулна уу.");
-  if (hasUpload && upload.size > MAX_IMAGE_BYTES) return fail("Зураг хэт том байна (3.5MB-аас бага байх ёстой).");
-
   const [existing] = id ? await db.select({ imageId: tours.imageId }).from(tours).where(eq(tours.id, id)) : [];
-  let imageId = existing?.imageId ?? null;
-  if (hasUpload) {
-    const [img] = await db
-      .insert(images)
-      .values({ mime: upload.type, data: Buffer.from(await upload.arrayBuffer()), createdAt: new Date().toISOString() })
-      .returning({ id: images.id });
-    imageId = img.id;
-  } else if (fd.get("imageRemove") === "1") {
-    imageId = null;
-  }
+  const image = await resolveImage(fd, existing?.imageId ?? null);
+  if ("error" in image) return fail(image.error);
 
   if (id) {
-    await db.update(tours).set({ ...data, imageId }).where(eq(tours.id, id));
+    await db.update(tours).set({ ...data, imageId: image.imageId }).where(eq(tours.id, id));
   } else {
-    await db.insert(tours).values({ ...data, imageId });
+    await db.insert(tours).values({ ...data, imageId: image.imageId });
   }
-  // The old photo is no longer referenced once replaced or removed
-  if (existing?.imageId && existing.imageId !== imageId) await db.delete(images).where(eq(images.id, existing.imageId));
+  await dropReplacedImage(existing?.imageId ?? null, image.imageId);
   refreshSite();
   redirect("/admin/tours?saved=1");
 }
 
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_IMAGE_BYTES = 3.5 * 1024 * 1024;
+
+// Reads the ImageField ("image" file + "imageRemove" flag) and stores a new upload.
+// Returns the image id the record should point at afterwards.
+async function resolveImage(fd: FormData, currentId: number | null): Promise<{ imageId: number | null } | { error: string }> {
+  const upload = fd.get("image");
+  if (upload instanceof File && upload.size > 0) {
+    if (!IMAGE_TYPES.includes(upload.type)) return { error: "Зөвхөн JPG, PNG, WebP зураг оруулна уу." };
+    if (upload.size > MAX_IMAGE_BYTES) return { error: "Зураг хэт том байна (3.5MB-аас бага байх ёстой)." };
+    const [img] = await db
+      .insert(images)
+      .values({ mime: upload.type, data: Buffer.from(await upload.arrayBuffer()), createdAt: new Date().toISOString() })
+      .returning({ id: images.id });
+    return { imageId: img.id };
+  }
+  return { imageId: fd.get("imageRemove") === "1" ? null : currentId };
+}
+
+// The old photo is no longer referenced once replaced or removed
+async function dropReplacedImage(oldId: number | null, newId: number | null) {
+  if (oldId && oldId !== newId) await db.delete(images).where(eq(images.id, oldId));
+}
 
 export async function deleteTour(fd: FormData) {
   await requireAuth();
@@ -231,4 +239,107 @@ export async function saveStats(fd: FormData) {
   await db.insert(settings).values({ key: "stats", value }).onConflictDoUpdate({ target: settings.key, set: { value } });
   refreshSite();
   redirect("/admin/home?saved=1");
+}
+
+/* ---------- hotels ---------- */
+
+export type HotelFormState = { error: string; values: Record<string, string> } | null;
+
+export async function saveHotel(_prev: HotelFormState, fd: FormData): Promise<HotelFormState> {
+  await requireAuth();
+  const id = Number(fd.get("id")) || null;
+  const fail = (error: string): HotelFormState => ({
+    error,
+    values: {
+      ...Object.fromEntries([...fd.entries()].filter((e): e is [string, string] => typeof e[1] === "string")),
+      // checkboxes share a name, so rebuild the list for the form
+      amenities: fd.getAll("amenities").map(String).join(","),
+    },
+  });
+
+  const category = str(fd, "category");
+  const regionCode = str(fd, "regionCode");
+  const stars = Number(str(fd, "stars"));
+  const pricePerNight = Number(str(fd, "pricePerNight").replace(/[^\d]/g, ""));
+  const data = {
+    name: str(fd, "name"),
+    nameEn: str(fd, "nameEn") || null,
+    regionCode,
+    city: str(fd, "city"),
+    cityEn: str(fd, "cityEn") || null,
+    stars,
+    category,
+    pricePerNight,
+    description: str(fd, "description"),
+    descriptionEn: str(fd, "descriptionEn") || null,
+    amenities: JSON.stringify(fd.getAll("amenities").map(String).filter((a) => (HOTEL_AMENITIES as readonly string[]).includes(a))),
+    published: fd.get("published") === "on",
+  };
+
+  if (!data.name || !data.city) return fail("Нэр болон хотыг бөглөнө үү.");
+  if (!(await db.select({ code: regions.code }).from(regions).where(eq(regions.code, regionCode))).length) return fail("Аймаг сонгоно уу.");
+  if (!(HOTEL_CATEGORIES as readonly string[]).includes(category)) return fail("Зэрэглэл сонгоно уу.");
+  if (!(Number.isInteger(stars) && stars >= 0 && stars <= 5)) return fail("Одны тоо 0–5 байна.");
+  if (!(pricePerNight > 0)) return fail("Шөнийн үнэ оруулна уу.");
+
+  const [existing] = id ? await db.select({ imageId: hotels.imageId }).from(hotels).where(eq(hotels.id, id)) : [];
+  const image = await resolveImage(fd, existing?.imageId ?? null);
+  if ("error" in image) return fail(image.error);
+
+  if (id) await db.update(hotels).set({ ...data, imageId: image.imageId }).where(eq(hotels.id, id));
+  else await db.insert(hotels).values({ ...data, imageId: image.imageId });
+  await dropReplacedImage(existing?.imageId ?? null, image.imageId);
+  refreshSite();
+  redirect("/admin/hotels?saved=1");
+}
+
+export async function deleteHotel(fd: FormData) {
+  await requireAuth();
+  const id = Number(fd.get("id"));
+  const [hotel] = await db.select({ imageId: hotels.imageId }).from(hotels).where(eq(hotels.id, id));
+  await db.delete(hotels).where(eq(hotels.id, id));
+  await dropReplacedImage(hotel?.imageId ?? null, null);
+  refreshSite();
+  redirect("/admin/hotels");
+}
+
+export async function toggleHotel(fd: FormData) {
+  await requireAuth();
+  await db
+    .update(hotels)
+    .set({ published: fd.get("value") === "1" })
+    .where(eq(hotels.id, Number(fd.get("id"))));
+  refreshSite();
+}
+
+/* ---------- regions (map content) ---------- */
+
+export async function saveRegion(fd: FormData) {
+  await requireAuth();
+  const code = str(fd, "code");
+  const [existing] = await db.select({ imageId: regions.imageId }).from(regions).where(eq(regions.code, code));
+  if (!existing) redirect("/admin/regions");
+  const path = `/admin/regions/${code}`;
+  const data = {
+    name: str(fd, "name"),
+    nameEn: str(fd, "nameEn"),
+    center: str(fd, "center"),
+    centerEn: str(fd, "centerEn"),
+    summary: str(fd, "summary"),
+    summaryEn: str(fd, "summaryEn"),
+    history: str(fd, "history"),
+    historyEn: str(fd, "historyEn"),
+    culture: str(fd, "culture"),
+    cultureEn: str(fd, "cultureEn"),
+    attractions: str(fd, "attractions"),
+    attractionsEn: str(fd, "attractionsEn"),
+  };
+  if (!data.name || !data.nameEn) back(path, "Монгол, англи нэрийг бөглөнө үү.");
+  const image = await resolveImage(fd, existing.imageId);
+  if ("error" in image) back(path, image.error);
+  const imageId = "imageId" in image ? image.imageId : existing.imageId;
+  await db.update(regions).set({ ...data, imageId }).where(eq(regions.code, code));
+  await dropReplacedImage(existing.imageId, imageId);
+  refreshSite();
+  redirect("/admin/regions?saved=1");
 }
