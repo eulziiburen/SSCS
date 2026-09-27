@@ -71,7 +71,11 @@ export const KIND_LABEL: Record<Kind, string> = {
 };
 
 export const VOUCHER_PRICE = 500000;
+// Quick picks; any whole amount within the limits can be typed in
 export const VOUCHER_AMOUNTS = [200000, VOUCHER_PRICE, 1000000];
+export const VOUCHER_MIN = 50000;
+export const VOUCHER_MAX = 50000000;
+export const isVoucherAmount = (n: number) => Number.isInteger(n) && n >= VOUCHER_MIN && n <= VOUCHER_MAX;
 
 export const BOOKING_STATUS = {
   new: "Шинэ",

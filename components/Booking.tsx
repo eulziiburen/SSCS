@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 import { createBooking } from "@/app/actions";
-import { dateRange, fmt, isEmail, VOUCHER_AMOUNTS, VOUCHER_PRICE, type Tour } from "@/lib/data";
+import { dateRange, fmt, isEmail, isVoucherAmount, VOUCHER_AMOUNTS, VOUCHER_MAX, VOUCHER_MIN, VOUCHER_PRICE, type Tour } from "@/lib/data";
 import { DEFAULT_DIAL, formatPhone, isValidPhone } from "@/lib/phone";
 import { CheckIcon, XIcon } from "./Icons";
 import { useI18n } from "./LocaleProvider";
@@ -94,7 +94,11 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
   const [iso, setIso] = useState(DEFAULT_DIAL.iso);
   const [email, setEmail] = useState("");
   const [pax, setPax] = useState(Math.min(2, maxPax));
-  const [amount, setAmount] = useState(VOUCHER_PRICE);
+  // Kept as typed text so the thousands separators can be shown while typing
+  const [amountText, setAmountText] = useState(VOUCHER_PRICE.toLocaleString("en-US"));
+  const amount = Number(amountText.replace(/\D/g, "")) || 0;
+  const amountOk = isVoucherAmount(amount);
+  const setAmount = (n: number) => setAmountText(n.toLocaleString("en-US"));
   const [touched, setTouched] = useState(false);
   const [code, setCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -105,13 +109,14 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
   const nameOk = !!lastName.trim() && !!firstName.trim();
   const phoneErr = touched && !phoneOk ? b.phoneError(iso === "MN") : null;
   const emailErr = touched && !isEmail(email.trim()) ? b.emailError : null;
+  const amountErr = isVoucher && touched && !amountOk ? b.amountError(fmt(VOUCHER_MIN), fmt(VOUCHER_MAX)) : null;
   const unit = isVoucher ? amount : target.tour.price;
   const total = unit * pax;
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     setTouched(true);
-    if (!nameOk || !phoneOk || !isEmail(email.trim())) return;
+    if (!nameOk || !phoneOk || !isEmail(email.trim()) || (isVoucher && !amountOk)) return;
     setServerErr(null);
     startTransition(async () => {
       try {
@@ -165,16 +170,34 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
       </div>
 
       {isVoucher ? (
-        <fieldset className="field">
-          <legend>{b.amount}</legend>
-          <div className="chips">
+        <div className="field">
+          <label htmlFor="b-amount">{b.amountLabel}</label>
+          <input
+            id="b-amount"
+            inputMode="numeric"
+            autoComplete="off"
+            placeholder={b.amountPlaceholder}
+            value={amountText}
+            onChange={(e) => {
+              const digits = e.target.value.replace(/\D/g, "").replace(/^0+/, "").slice(0, 9);
+              setAmountText(digits ? Number(digits).toLocaleString("en-US") : "");
+            }}
+            aria-invalid={!!amountErr}
+            aria-describedby={amountErr ? "b-amount-err" : undefined}
+          />
+          {amountErr && (
+            <span className="err" id="b-amount-err">
+              {amountErr}
+            </span>
+          )}
+          <div className="chips" role="group" aria-label={b.amount}>
             {VOUCHER_AMOUNTS.map((a) => (
               <button type="button" key={a} className="chip" aria-pressed={amount === a} onClick={() => setAmount(a)}>
                 {fmt(a)}
               </button>
             ))}
           </div>
-        </fieldset>
+        </div>
       ) : (
         <div className="sum">
           <strong>{target.tour.title}</strong>

@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { db, ensureDb } from "@/db/client";
 import { bookings, reviews } from "@/db/schema";
 import { calculate, type CalcInput } from "@/lib/calc";
-import { isEmail, VOUCHER_AMOUNTS } from "@/lib/data";
+import { isEmail, isVoucherAmount } from "@/lib/data";
 import { getDictionary, isLocale, type Locale } from "@/lib/i18n";
 import { DEFAULT_DIAL, dialByIso, formatPhone, isValidPhone } from "@/lib/phone";
 import { HOTEL_CATEGORIES, HOTEL_CATEGORY_MN, type HotelCategory } from "@/lib/places";
@@ -84,7 +84,7 @@ export async function createBooking(input: BookingInput): Promise<BookingResult>
   }
 
   if (!(pax >= 1 && pax <= 10)) return { ok: false, error: msg.pax };
-  if (!VOUCHER_AMOUNTS.includes(Number(input.amount))) return { ok: false, error: msg.amount };
+  if (!isVoucherAmount(Number(input.amount))) return { ok: false, error: msg.amount };
   const unit = Number(input.amount);
   return save(parsed.contact, { type: "voucher", tourTitle: "Аяллын эрхийн бичиг", pax, unitPrice: unit, total: unit * pax }, input.locale);
 }
