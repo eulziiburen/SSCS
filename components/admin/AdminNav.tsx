@@ -4,15 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const ITEMS = [
-  { href: "/admin", label: "Тойм" },
-  { href: "/admin/bookings", label: "Захиалгууд" },
-  { href: "/admin/tours", label: "Аялалууд" },
-  { href: "/admin/hotels", label: "Зочид буудал" },
-  { href: "/admin/regions", label: "Монгол орон" },
-  { href: "/admin/news", label: "Мэдээ" },
-  { href: "/admin/reviews", label: "Сэтгэгдэл" },
-  { href: "/admin/home", label: "Нүүр хуудас" },
-  { href: "/admin/settings", label: "Тооцоолуур" },
+  { href: "/st-admin", label: "Тойм" },
+  { href: "/st-admin/bookings", label: "Захиалгууд" },
+  { href: "/st-admin/tours", label: "Аялалууд" },
+  { href: "/st-admin/hotels", label: "Зочид буудал" },
+  { href: "/st-admin/regions", label: "Монгол орон" },
+  { href: "/st-admin/news", label: "Мэдээ" },
+  { href: "/st-admin/reviews", label: "Сэтгэгдэл" },
+  { href: "/st-admin/home", label: "Нүүр хуудас" },
+  { href: "/st-admin/settings", label: "Тооцоолуур" },
 ];
 
 export function AdminNav({ newCount, pendingReviews }: { newCount: number; pendingReviews: number }) {
@@ -20,12 +20,12 @@ export function AdminNav({ newCount, pendingReviews }: { newCount: number; pendi
   return (
     <nav className="a-nav" aria-label="Admin цэс">
       {ITEMS.map((i) => {
-        const active = i.href === "/admin" ? pathname === "/admin" : pathname.startsWith(i.href);
+        const active = i.href === "/st-admin" ? pathname === "/st-admin" : pathname.startsWith(i.href);
         return (
           <Link key={i.href} href={i.href} aria-current={active ? "page" : undefined}>
             {i.label}
-            {i.href === "/admin/bookings" && newCount > 0 && <span className="a-count">{newCount}</span>}
-            {i.href === "/admin/reviews" && pendingReviews > 0 && <span className="a-count">{pendingReviews}</span>}
+            {i.href === "/st-admin/bookings" && newCount > 0 && <span className="a-count">{newCount}</span>}
+            {i.href === "/st-admin/reviews" && pendingReviews > 0 && <span className="a-count">{pendingReviews}</span>}
           </Link>
         );
       })}

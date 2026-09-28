@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { deleteBooking, saveBookingNote, setBookingStatus } from "@/app/admin/actions";
+import { deleteBooking, saveBookingNote, setBookingStatus } from "@/app/st-admin/actions";
 import type { BookingRow } from "@/db/schema";
 import { BOOKING_STATUS, fmt } from "@/lib/data";
 import { AutoSelect, ConfirmButton } from "./Controls";
@@ -49,7 +49,7 @@ export function BookingTable({ bookings, compact = false }: { bookings: BookingR
               </td>
               <td>
                 <span className={`a-type t-${b.type}`}>{TYPE_LABEL[b.type]}</span>{" "}
-                {b.tourId ? <Link href={`/admin/tours/${b.tourId}`}>{b.tourTitle}</Link> : b.tourTitle}
+                {b.tourId ? <Link href={`/st-admin/tours/${b.tourId}`}>{b.tourTitle}</Link> : b.tourTitle}
                 <small>{b.details ? (b.type === "tour" ? `Тооцоолуур: ${b.details}` : b.details) : `${b.pax} × ${fmt(b.unitPrice)}`}</small>
               </td>
               {/* Custom trips are priced by the manager afterwards */}

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { deleteHotel, saveHotel } from "@/app/admin/actions";
+import { deleteHotel, saveHotel } from "@/app/st-admin/actions";
 import { HOTEL_AMENITIES, HOTEL_CATEGORIES, HOTEL_CATEGORY_MN, type Hotel, type HotelAmenity } from "@/lib/places";
 import { imageUrl } from "../TourVisual";
 import { ConfirmButton, SubmitButton } from "./Controls";
@@ -134,7 +134,7 @@ export function HotelForm({ hotel: h, regions }: { hotel?: Hotel; regions: { cod
         </section>
 
         <div className="a-actions">
-          <Link href="/admin/hotels" className="btn ghost">
+          <Link href="/st-admin/hotels" className="btn ghost">
             Болих
           </Link>
           <SubmitButton>{h ? "Хадгалах" : "Буудал нэмэх"}</SubmitButton>

@@ -48,7 +48,7 @@ async function save(contact: NonNullable<ReturnType<typeof parseContact>["contac
     const code = "ST-" + Math.floor(100000 + Math.random() * 900000);
     try {
       await db.insert(bookings).values({ ...row, ...contact, code, createdAt: new Date().toISOString() });
-      revalidatePath("/admin", "layout");
+      revalidatePath("/st-admin", "layout");
       return { ok: true, code };
     } catch (e) {
       if (!String(e).includes("UNIQUE")) throw e;
@@ -211,6 +211,6 @@ export async function submitReview(_prev: ReviewState, fd: FormData): Promise<Re
     locale,
     createdAt: new Date().toISOString(),
   });
-  revalidatePath("/admin", "layout");
+  revalidatePath("/st-admin", "layout");
   return { ok: true };
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { deleteTour, saveTour } from "@/app/admin/actions";
+import { deleteTour, saveTour } from "@/app/st-admin/actions";
 import { KIND_LABEL, SCENE_KEYS, SCENE_LABEL, type Tour } from "@/lib/data";
 import { imageUrl } from "../TourVisual";
 import { ConfirmButton, SubmitButton } from "./Controls";
@@ -167,7 +167,7 @@ export function TourForm({ tour: t }: { tour?: Tour }) {
         </section>
 
         <div className="a-actions">
-          <Link href="/admin/tours" className="btn ghost">
+          <Link href="/st-admin/tours" className="btn ghost">
             Болих
           </Link>
           <SubmitButton>{t ? "Хадгалах" : "Аялал нэмэх"}</SubmitButton>
