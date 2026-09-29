@@ -42,6 +42,8 @@ export type Tour = {
   countryEn: string | null;
   routeEn: string[];
   heroEyebrowEn: string | null;
+  schedule: string | null; // lib/schedule.ts format
+  scheduleEn: string | null;
   imageId: number | null;
 };
 
@@ -56,6 +58,7 @@ export function localizeTour(t: Tour, locale: "mn" | "en"): Tour {
     country: t.countryEn || t.country,
     route: t.routeEn.length ? t.routeEn : t.route,
     heroEyebrow: t.heroEyebrowEn || null,
+    schedule: t.scheduleEn || t.schedule,
   };
 }
 

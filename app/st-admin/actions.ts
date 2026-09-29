@@ -82,6 +82,8 @@ export async function saveTour(_prev: TourFormState, fd: FormData): Promise<Tour
     countryEn: str(fd, "countryEn") || null,
     routeEn: routeEn.length ? JSON.stringify(routeEn) : null,
     heroEyebrowEn: str(fd, "heroEyebrowEn") || null,
+    schedule: str(fd, "schedule") || null,
+    scheduleEn: str(fd, "scheduleEn") || null,
     upcoming: fd.get("upcoming") === "on",
     published: fd.get("published") === "on",
   };

@@ -674,3 +674,23 @@ svg.hotel-ph path { stroke: color-mix(in srgb, var(--sky) 60%, var(--surface)); 
 .st-cancelled { background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); }
 .st-contacted { background: color-mix(in srgb, var(--sky) 14%, transparent); color: var(--sky); }
 @media (max-width: 760px) { .account-grid { grid-template-columns: 1fr; } }
+
+/* tour programme */
+.programme-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.detail-main .programme-head h2 { margin: 0; }
+.programme-head span { color: var(--muted); font-size: 13px; }
+.prog-days { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.prog-day { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.prog-day-head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; padding: 12px 16px; background: var(--chip); }
+.prog-num { font-weight: 800; color: var(--sky); font-size: 14px; }
+.prog-day-head time { font-family: var(--mono); font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.prog-day-head strong { flex-basis: 100%; font-size: 15px; }
+.prog-items { list-style: none; margin: 0; padding: 6px 0; }
+.prog-items li { display: grid; grid-template-columns: 104px 1fr; gap: 12px; padding: 8px 16px; align-items: baseline; }
+.prog-items li + li { border-top: 1px dashed var(--line); }
+.prog-time { font-family: var(--mono); font-weight: 700; font-size: 13.5px; color: var(--saffron); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.prog-items li.untimed .prog-time::before { content: "•"; color: var(--muted); }
+.prog-note { margin: 12px 0 0; color: var(--muted); font-size: 13px; }
+@media (max-width: 560px) { .prog-items li { grid-template-columns: 86px 1fr; gap: 8px; padding: 8px 12px; } .prog-time { font-size: 12.5px; } }
+.prog-items.no-times li { grid-template-columns: 1fr; }
+.prog-items.no-times .prog-time { display: none; }

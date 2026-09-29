@@ -10,6 +10,8 @@ export const tours = sqliteTable("tours", {
   countryEn: text("country_en"),
   routeEn: text("route_en"), // JSON string[]
   heroEyebrowEn: text("hero_eyebrow_en"),
+  schedule: text("schedule"), // day-by-day programme, see lib/schedule.ts
+  scheduleEn: text("schedule_en"),
   imageId: integer("image_id"), // uploaded photo (images.id); falls back to the scene illustration
   startDate: text("start_date").notNull(), // YYYY-MM-DD
   endDate: text("end_date").notNull(), // YYYY-MM-DD

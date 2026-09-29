@@ -9,6 +9,7 @@ import { dateRange, fmt, localizeTour } from "@/lib/data";
 import { badgeLabel } from "@/lib/i18n";
 import { getI18n } from "@/lib/locale";
 import { getTour, getTours } from "@/lib/queries";
+import { dayDate, outlineFromRoute, parseSchedule } from "@/lib/schedule";
 
 // Pages depend on the visitor's language (cookie), so they render per request rather than at build time
 
@@ -32,6 +33,7 @@ export default async function TourPage({ params }: PageProps<"/tours/[id]">) {
     .slice(0, 3)
     .map((x) => localizeTour(x, locale));
   const low = tour.seats <= 3;
+  const schedule = parseSchedule(tour.schedule);
 
   return (
     <>
@@ -76,6 +78,45 @@ export default async function TourPage({ params }: PageProps<"/tours/[id]">) {
                 </li>
               ))}
             </ol>
+          </section>
+
+          <section className="programme" aria-labelledby="prog-h">
+            <div className="programme-head">
+              <h2 id="prog-h">{t.tour.programme}</h2>
+              <span>{t.tour.programmeLead}</span>
+            </div>
+            <ol className="prog-days">
+              {(schedule.length
+                ? schedule
+                : outlineFromRoute(tour.route, tour.days).map((o) => ({
+                    day: o.day,
+                    title: "",
+                    items: [{ time: null, text: o.kind === "depart" ? t.tour.outlineDepart(o.stop) : o.kind === "return" ? t.tour.outlineReturn(o.stop) : t.tour.outlineStay(o.stop) }],
+                  }))
+              ).map((d) => {
+                const date = dayDate(tour.startDate, d.day);
+                return (
+                  <li key={d.day} className="prog-day">
+                    <div className="prog-day-head">
+                      <span className="prog-num">{t.tour.day(d.day)}</span>
+                      <time dateTime={date.toISOString().slice(0, 10)}>
+                        {String(date.getUTCMonth() + 1).padStart(2, "0")}.{String(date.getUTCDate()).padStart(2, "0")} · {t.tour.weekdays[date.getUTCDay()]}
+                      </time>
+                      {d.title && <strong>{d.title}</strong>}
+                    </div>
+                    <ul className={`prog-items${d.items.some((it) => it.time) ? "" : " no-times"}`}>
+                      {d.items.map((it, i) => (
+                        <li key={i} className={it.time ? undefined : "untimed"}>
+                          <span className="prog-time">{it.time ?? ""}</span>
+                          <span>{it.text}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                );
+              })}
+            </ol>
+            {!schedule.length && <p className="prog-note">{t.tour.outlineNote}</p>}
           </section>
 
           <section className="incl" aria-label={t.tour.inclusion}>
