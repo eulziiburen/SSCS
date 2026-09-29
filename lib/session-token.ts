@@ -23,7 +23,7 @@ export function timingSafeStringEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-async function hmacSign(value: string): Promise<string> {
+export async function hmacSign(value: string): Promise<string> {
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(getSecret()),

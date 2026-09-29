@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db, ensureDb } from "@/db/client";
-import { bookings, hotels, images, news, regions, reviews, settings, tours } from "@/db/schema";
+import { bookings, hotels, images, news, regions, reviews, settings, tours, users } from "@/db/schema";
 import { HOTEL_AMENITIES, HOTEL_CATEGORIES } from "@/lib/places";
 import { ADDONS, CURRENCIES, mergeCalc } from "@/lib/calc";
 import { MAX_STATS, mergeStats } from "@/lib/stats";
@@ -360,4 +360,15 @@ export async function deleteReview(fd: FormData) {
   await requireAuth();
   await db.delete(reviews).where(eq(reviews.id, Number(fd.get("id"))));
   refreshSite();
+}
+
+/* ---------- traveler accounts ---------- */
+
+// Bookings stay (the office still needs them); they just lose the link to the account
+export async function deleteUser(fd: FormData) {
+  await requireAuth();
+  const id = Number(fd.get("id"));
+  await db.update(bookings).set({ userId: null }).where(eq(bookings.userId, id));
+  await db.delete(users).where(eq(users.id, id));
+  revalidatePath("/st-admin/users");
 }

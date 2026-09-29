@@ -11,6 +11,7 @@ const ITEMS = [
   { href: "/st-admin/regions", label: "Монгол орон" },
   { href: "/st-admin/news", label: "Мэдээ" },
   { href: "/st-admin/reviews", label: "Сэтгэгдэл" },
+  { href: "/st-admin/users", label: "Хэрэглэгчид" },
   { href: "/st-admin/home", label: "Нүүр хуудас" },
   { href: "/st-admin/settings", label: "Тооцоолуур" },
 ];

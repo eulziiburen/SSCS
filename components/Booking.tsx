@@ -7,6 +7,7 @@ import { DEFAULT_DIAL, formatPhone, isValidPhone } from "@/lib/phone";
 import { CurrencyApprox } from "./CurrencyApprox";
 import { CheckIcon, XIcon } from "./Icons";
 import { useI18n } from "./LocaleProvider";
+import { useUser } from "./UserProvider";
 import { NameFields } from "./NameFields";
 import { PhoneField } from "./PhoneField";
 
@@ -89,11 +90,12 @@ function BookingForm({ target, onClose }: { target: Target; onClose: () => void 
   const { locale, t } = useI18n();
   const b = t.booking;
   const maxPax = isVoucher ? 10 : Math.max(1, target.tour.seats);
-  const [lastName, setLastName] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [iso, setIso] = useState(DEFAULT_DIAL.iso);
-  const [email, setEmail] = useState("");
+  const user = useUser();
+  const [lastName, setLastName] = useState(user?.lastName ?? "");
+  const [firstName, setFirstName] = useState(user?.firstName ?? "");
+  const [phone, setPhone] = useState(user?.phone ?? "");
+  const [iso, setIso] = useState(user?.phoneIso ?? DEFAULT_DIAL.iso);
+  const [email, setEmail] = useState(user?.email ?? "");
   const [pax, setPax] = useState(Math.min(2, maxPax));
   // Kept as typed text so the thousands separators can be shown while typing
   const [amountText, setAmountText] = useState(VOUCHER_PRICE.toLocaleString("en-US"));

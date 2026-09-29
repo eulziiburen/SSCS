@@ -6,6 +6,7 @@ import { isEmail } from "@/lib/data";
 import { DEFAULT_DIAL, formatPhone, isValidPhone } from "@/lib/phone";
 import { CheckIcon } from "./Icons";
 import { useI18n } from "./LocaleProvider";
+import { useUser } from "./UserProvider";
 import { NameFields } from "./NameFields";
 import { PhoneField } from "./PhoneField";
 
@@ -31,11 +32,12 @@ export function ContactForm({
 }) {
   const { t } = useI18n();
   const b = t.booking;
-  const [lastName, setLastName] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [iso, setIso] = useState(DEFAULT_DIAL.iso);
-  const [email, setEmail] = useState("");
+  const user = useUser();
+  const [lastName, setLastName] = useState(user?.lastName ?? "");
+  const [firstName, setFirstName] = useState(user?.firstName ?? "");
+  const [phone, setPhone] = useState(user?.phone ?? "");
+  const [iso, setIso] = useState(user?.phoneIso ?? DEFAULT_DIAL.iso);
+  const [email, setEmail] = useState(user?.email ?? "");
   const [touched, setTouched] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [code, setCode] = useState<string | null>(null);

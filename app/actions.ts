@@ -10,6 +10,7 @@ import { getDictionary, isLocale, type Locale } from "@/lib/i18n";
 import { DEFAULT_DIAL, dialByIso, formatPhone, isValidPhone } from "@/lib/phone";
 import { HOTEL_CATEGORIES, HOTEL_CATEGORY_MN, type HotelCategory } from "@/lib/places";
 import { getCalcSettings, getHotel, getHotels, getRegions, getTour } from "@/lib/queries";
+import { getCurrentUser } from "@/lib/user-auth";
 
 // dial is the ISO country of the phone number (e.g. "MN"); missing means Mongolia for older clients
 export type Contact = { lastName: string; firstName: string; phone: string; dial?: string; email: string; locale?: Locale };
@@ -20,7 +21,7 @@ export type BookingInput =
 
 export type BookingResult = { ok: true; code: string } | { ok: false; error: string };
 
-type Row = Omit<typeof bookings.$inferInsert, "code" | "name" | "lastName" | "firstName" | "phone" | "email" | "createdAt">;
+type Row = Omit<typeof bookings.$inferInsert, "code" | "name" | "lastName" | "firstName" | "phone" | "email" | "createdAt" | "userId">;
 
 // Mongolian labels for the admin's view of a booking
 const ADDON_MN = { sim: "Дата сим", insurance: "Даатгал", guide: "Хувийн хөтөч", photo: "Зурагчин" } as const;
@@ -44,10 +45,12 @@ function parseContact(input: Contact) {
 
 async function save(contact: NonNullable<ReturnType<typeof parseContact>["contact"]>, row: Row, locale: unknown): Promise<BookingResult> {
   await ensureDb();
+  // Signed-in travelers see the booking on their account page
+  const userId = (await getCurrentUser())?.id ?? null;
   for (let attempt = 0; attempt < 5; attempt++) {
     const code = "ST-" + Math.floor(100000 + Math.random() * 900000);
     try {
-      await db.insert(bookings).values({ ...row, ...contact, code, createdAt: new Date().toISOString() });
+      await db.insert(bookings).values({ ...row, ...contact, userId, code, createdAt: new Date().toISOString() });
       revalidatePath("/st-admin", "layout");
       return { ok: true, code };
     } catch (e) {

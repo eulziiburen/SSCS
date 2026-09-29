@@ -24,8 +24,8 @@ export default async function PanelLayout({ children }: LayoutProps<"/st-admin">
           </Link>
           <AdminNav newCount={newCount} pendingReviews={pendingReviews} />
           <div className="a-top-end">
-            <Link href="/" className="a-link" target="_blank">
-              Сайт руу ↗
+            <Link href="/" className="a-btn a-site" target="_blank" aria-label="Сайт руу (шинэ цонхонд)" title="Сайт руу">
+              ↗
             </Link>
             <form action={logout}>
               <button type="submit" className="a-btn">

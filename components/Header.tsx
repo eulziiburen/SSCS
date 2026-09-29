@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { LOCALES, type Locale } from "@/lib/i18n";
 import { Logo, MenuIcon, XIcon } from "./Icons";
 import { useI18n } from "./LocaleProvider";
+import { useUser } from "./UserProvider";
 
 type ThemePref = "light" | "dark" | "system";
 
@@ -80,6 +81,7 @@ function LangSwitch() {
 
 export function Header() {
   const { t } = useI18n();
+  const user = useUser();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -124,6 +126,22 @@ export function Header() {
           <LangSwitch />
           <ThemeSwitch />
         </div>
+        <Link
+          href={user ? "/account" : "/login"}
+          className={`icon-btn account-btn${user ? " in" : ""}`}
+          aria-label={user ? `${t.auth.account}: ${user.firstName}` : t.auth.login}
+          title={user ? t.auth.account : t.auth.login}
+          aria-current={pathname === "/account" ? "page" : undefined}
+        >
+          {user ? (
+            <span aria-hidden="true">{user.firstName.slice(0, 1).toUpperCase()}</span>
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 21a8 8 0 0 1 16 0" />
+            </svg>
+          )}
+        </Link>
         <button type="button" className="icon-btn menu-btn" aria-expanded={open} aria-controls="main-nav" aria-label={t.nav.menu} onClick={() => setOpen((o) => !o)}>
           {open ? <XIcon /> : <MenuIcon />}
         </button>

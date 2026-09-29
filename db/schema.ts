@@ -40,6 +40,7 @@ export const bookings = sqliteTable("bookings", {
   total: integer("total").notNull(),
   status: text("status", { enum: ["new", "contacted", "confirmed", "cancelled"] }).notNull().default("new"),
   note: text("note"),
+  userId: integer("user_id"), // set when the traveler was signed in
   details: text("details"), // calculator breakdown, e.g. "Том 2, хүүхэд 1 · Ганц өрөө 1"
   createdAt: text("created_at").notNull(),
 });
@@ -110,6 +111,33 @@ export const reviews = sqliteTable("reviews", {
   createdAt: text("created_at").notNull(),
 });
 
+// Traveler accounts. Email and phone are both unique and either can be used to sign in.
+export const users = sqliteTable("users", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  lastName: text("last_name").notNull(),
+  firstName: text("first_name").notNull(),
+  email: text("email").notNull().unique(), // lowercased
+  phone: text("phone").notNull(), // display form, "+976 9911 2233"
+  phoneIso: text("phone_iso").notNull(),
+  phoneNorm: text("phone_norm").notNull().unique(), // digits incl. country code, for lookup
+  passwordHash: text("password_hash").notNull(),
+  sessionVersion: integer("session_version").notNull().default(1), // bumped to sign out every device
+  failedLogins: integer("failed_logins").notNull().default(0),
+  lockedUntil: text("locked_until"),
+  createdAt: text("created_at").notNull(),
+});
+
+// One-time codes for OTP sign-in and password reset; only a hash of the code is stored
+export const otpCodes = sqliteTable("otp_codes", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  purpose: text("purpose", { enum: ["login", "reset"] }).notNull(),
+  target: text("target").notNull(), // lowercased email
+  codeHash: text("code_hash").notNull(),
+  expiresAt: text("expires_at").notNull(),
+  attempts: integer("attempts").notNull().default(0),
+  createdAt: text("created_at").notNull(),
+});
+
 export const settings = sqliteTable("settings", {
   key: text("key").primaryKey(),
   value: text("value").notNull(), // JSON
@@ -121,3 +149,4 @@ export type NewsRow = typeof news.$inferSelect;
 export type RegionRow = typeof regions.$inferSelect;
 export type HotelRow = typeof hotels.$inferSelect;
 export type ReviewRow = typeof reviews.$inferSelect;
+export type UserRow = typeof users.$inferSelect;

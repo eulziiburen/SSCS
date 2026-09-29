@@ -103,6 +103,30 @@ CREATE TABLE IF NOT EXISTS reviews (
   status TEXT NOT NULL DEFAULT 'pending',
   created_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  last_name TEXT NOT NULL,
+  first_name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  phone TEXT NOT NULL,
+  phone_iso TEXT NOT NULL,
+  phone_norm TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  session_version INTEGER NOT NULL DEFAULT 1,
+  failed_logins INTEGER NOT NULL DEFAULT 0,
+  locked_until TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS otp_codes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  purpose TEXT NOT NULL,
+  target TEXT NOT NULL,
+  code_hash TEXT NOT NULL,
+  expires_at TEXT NOT NULL,
+  attempts INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS otp_codes_target ON otp_codes (target, purpose);
 CREATE TABLE IF NOT EXISTS images (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   mime TEXT NOT NULL,
@@ -117,7 +141,7 @@ const TOUR_COLS = ["kind", "scene", "country", "title", "start_date", "end_date"
 const ADDED_COLUMNS: Record<string, string[]> = {
   tours: ["title_en", "country_en", "route_en", "hero_eyebrow_en", "image_id INTEGER"],
   news: ["title_en", "text_en"],
-  bookings: ["details", "email", "last_name", "first_name"],
+  bookings: ["details", "email", "last_name", "first_name", "user_id INTEGER"],
 };
 
 async function migrate() {
