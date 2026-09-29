@@ -33,6 +33,10 @@ export default async function ServicesPage({ searchParams }: PageProps<"/service
               <Link href="/services/sim" className="btn sm">
                 {t.sim.order}
               </Link>
+            ) : k === "stay" ? (
+              <Link href="/hotels" className="btn sm">
+                {t.nav.hotels}
+              </Link>
             ) : (
               <Link href={`/services?s=${k}#request`} className="btn ghost sm">
                 {t.svc.request}

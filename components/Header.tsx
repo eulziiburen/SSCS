@@ -100,7 +100,7 @@ function ServicesMenu({ onNavigate }: { onNavigate: () => void }) {
   // A click right after hover-open would otherwise close the menu the pointer just opened
   const hoverOpened = useRef(false);
   const hover = (next: boolean) => (e: React.PointerEvent) => {
-    if (e.pointerType !== "mouse" || !matchMedia("(min-width: 1241px)").matches) return;
+    if (e.pointerType !== "mouse" || !matchMedia("(min-width: 1121px)").matches) return;
     hoverOpened.current = next;
     setOpen(next);
   };
@@ -109,7 +109,7 @@ function ServicesMenu({ onNavigate }: { onNavigate: () => void }) {
     <div className={`nav-drop${open ? " open" : ""}`} ref={root} onPointerEnter={hover(true)} onPointerLeave={hover(false)}>
       <button
         type="button"
-        className={pathname.startsWith("/services") ? "active" : undefined}
+        className={pathname.startsWith("/services") || pathname.startsWith("/hotels") ? "active" : undefined}
         aria-expanded={open}
         aria-controls="services-menu"
         onClick={() => {
@@ -126,14 +126,14 @@ function ServicesMenu({ onNavigate }: { onNavigate: () => void }) {
         {SERVICE_KEYS.map((k, i) => (
           <li key={k}>
             <Link
-              href={k === "sim" ? "/services/sim" : `/services#${k}`}
+              href={k === "sim" ? "/services/sim" : k === "stay" ? "/hotels" : `/services#${k}`}
               onClick={() => {
                 setOpen(false);
                 onNavigate();
               }}
             >
               <ServiceIcon service={k} size={32} />
-              {t.home.serviceList[i][0]}
+              {k === "stay" ? t.nav.hotels : t.home.serviceList[i][0]}
             </Link>
           </li>
         ))}
@@ -153,7 +153,6 @@ export function Header() {
     { href: "/calendar", label: t.nav.calendar },
     { href: "/plan", label: t.nav.plan },
     { href: "/mongolia", label: t.nav.mongolia },
-    { href: "/hotels", label: t.nav.hotels },
     { href: "/calculator", label: t.nav.calculator },
   ];
 

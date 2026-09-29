@@ -85,7 +85,7 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .nav a:not(.btn):hover, .nav a[aria-current="page"] { color: var(--ink); border-color: var(--saffron); }
 .nav-cta { display: none; }
 .menu-btn { display: none; }
-@media (max-width: 1240px) {
+@media (max-width: 1120px) {
   .menu-btn { display: grid; }
   .nav { position: fixed; inset: calc(var(--header-h) + env(safe-area-inset-top, 0px)) 0 0 0; flex-direction: column; align-items: stretch; gap: 0; margin: 0; padding: 12px 20px 24px; background: var(--surface); opacity: 0; transform: translateY(-8px); visibility: hidden; transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s; overflow: auto; }
   .nav.open { opacity: 1; transform: none; visibility: visible; }
@@ -692,7 +692,7 @@ svg.hotel-ph path { stroke: color-mix(in srgb, var(--sky) 60%, var(--surface)); 
 .nav-drop.open .nav-drop-menu { opacity: 1; visibility: visible; transform: none; }
 .nav .nav-drop-menu a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; border: 0; color: var(--ink); font-weight: 600; text-decoration: none; white-space: nowrap; }
 .nav .nav-drop-menu a:hover, .nav .nav-drop-menu a:focus-visible { background: var(--chip); }
-@media (max-width: 1240px) {
+@media (max-width: 1120px) {
   .nav-drop > button { width: 100%; justify-content: space-between; font-size: 18px; padding: 14px 4px; border-bottom: 1px solid var(--line); color: var(--ink); }
   .nav-drop-menu { position: static; box-shadow: none; border: 0; border-radius: 0; padding: 4px 0 8px 8px; min-width: 0; transform: none; display: none; }
   .nav-drop.open .nav-drop-menu { display: grid; }
