@@ -5,6 +5,7 @@ import { HOTEL_AMENITIES, HOTEL_CATEGORIES, lines, type Hotel, type HotelAmenity
 import { mergeCalc, type CalcSettings } from "./calc";
 import { parseCountries, SIM_ACTIVATION, SIM_KINDS, type SimActivation, type SimKind, type SimPlan } from "./sims";
 import { mergeStats, type Stat } from "./stats";
+import { mergeSocial, type Social } from "./social";
 import { daysBetween, SCENE_KEYS, type NewsItem, type SceneKey, type Tour } from "./data";
 
 function parseList(json: string | null): string[] {
@@ -137,4 +138,14 @@ export async function getSimPlan(id: number): Promise<SimPlan | undefined> {
   await ensureDb();
   const [row] = await db.select().from(simPlans).where(eq(simPlans.id, id));
   return row ? toSimPlan(row) : undefined;
+}
+
+export async function getSocial(): Promise<Social> {
+  await ensureDb();
+  const [row] = await db.select().from(settings).where(eq(settings.key, "social"));
+  try {
+    return mergeSocial(row ? JSON.parse(row.value) : null);
+  } catch {
+    return mergeSocial(null);
+  }
 }

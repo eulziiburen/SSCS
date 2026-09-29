@@ -898,3 +898,11 @@ svg.hotel-ph path { stroke: color-mix(in srgb, var(--sky) 60%, var(--surface)); 
   .cal-list li > .btn { grid-column: 2; justify-self: start; }
   .cal-nav h2 { min-width: 0; font-size: 18px; }
 }
+
+.a-grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+@media (max-width: 640px) { .a-grid2 { grid-template-columns: 1fr; } }
+
+/* footer social links */
+.site-foot .social { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.site-foot .social a { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.18); color: #d7e2ec; transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s; }
+.site-foot .social a:hover { background: var(--saffron); border-color: var(--saffron); color: #fff; text-decoration: none; transform: translateY(-2px); }

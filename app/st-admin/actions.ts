@@ -9,6 +9,7 @@ import { parseCountries, SIM_ACTIVATION, SIM_KINDS } from "@/lib/sims";
 import { HOTEL_AMENITIES, HOTEL_CATEGORIES } from "@/lib/places";
 import { ADDONS, CURRENCIES, mergeCalc } from "@/lib/calc";
 import { MAX_STATS, mergeStats } from "@/lib/stats";
+import { cleanUrl, mergeSocial, SOCIAL_KEYS } from "@/lib/social";
 import { checkCredentials, createSession, destroySession, isAuthenticated } from "@/lib/auth";
 import { BOOKING_STATUS, SCENE_KEYS, type BookingStatus } from "@/lib/data";
 
@@ -240,6 +241,16 @@ export async function saveStats(fd: FormData) {
   const rows = Array.from({ length: MAX_STATS }, (_, i) => ({ value: str(fd, `value${i}`), mn: str(fd, `mn${i}`), en: str(fd, `en${i}`) }));
   const value = JSON.stringify(mergeStats(rows));
   await db.insert(settings).values({ key: "stats", value }).onConflictDoUpdate({ target: settings.key, set: { value } });
+  refreshSite();
+  redirect("/st-admin/home?saved=1");
+}
+
+export async function saveSocial(fd: FormData) {
+  await requireAuth();
+  const bad = SOCIAL_KEYS.filter((k) => str(fd, k) && !cleanUrl(str(fd, k)));
+  if (bad.length) back("/st-admin/home", "Холбоос буруу байна: " + bad.join(", "));
+  const value = JSON.stringify(mergeSocial(Object.fromEntries(SOCIAL_KEYS.map((k) => [k, str(fd, k)]))));
+  await db.insert(settings).values({ key: "social", value }).onConflictDoUpdate({ target: settings.key, set: { value } });
   refreshSite();
   redirect("/st-admin/home?saved=1");
 }

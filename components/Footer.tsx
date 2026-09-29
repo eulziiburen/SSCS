@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { getI18n } from "@/lib/locale";
+import { getSocial } from "@/lib/queries";
 import { Logo } from "./Icons";
+import { SocialLinks } from "./SocialLinks";
 
 export async function Footer() {
-  const { t } = await getI18n();
+  const [{ t }, social] = await Promise.all([getI18n(), getSocial()]);
   return (
     <footer id="contact" className="site-foot">
       <div className="wrap">
@@ -13,6 +15,7 @@ export async function Footer() {
               <Logo tone="dark" height={28} />
             </div>
             <p>{t.footer.tagline}</p>
+            <SocialLinks social={social} />
           </div>
           <div>
             <h4>{t.footer.menu}</h4>
