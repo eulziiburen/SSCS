@@ -10,16 +10,14 @@ import { useI18n } from "./LocaleProvider";
 import { ServiceIcon } from "./ServiceIcon";
 import { useUser } from "./UserProvider";
 
-type ThemePref = "light" | "dark" | "system";
+type ThemePref = "light" | "dark";
 
 function setTheme(pref: ThemePref) {
   const root = document.documentElement;
   root.dataset.themePref = pref;
-  if (pref === "system") delete root.dataset.theme;
-  else root.dataset.theme = pref;
+  root.dataset.theme = pref;
   try {
-    if (pref === "system") localStorage.removeItem("theme");
-    else localStorage.setItem("theme", pref);
+    localStorage.setItem("theme", pref);
   } catch {}
 }
 
@@ -35,12 +33,6 @@ const THEME_ICONS: Record<ThemePref, React.ReactNode> = {
       <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
     </svg>
   ),
-  system: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="4" width="18" height="13" rx="1.5" />
-      <path d="M8 20h8M12 17v3" />
-    </svg>
-  ),
 };
 
 // The active option is highlighted in CSS from <html data-theme-pref>, which an inline
@@ -49,7 +41,7 @@ function ThemeSwitch() {
   const { t } = useI18n();
   return (
     <div className="seg theme-switch" role="group" aria-label={t.theme.group}>
-      {(["light", "dark", "system"] as const).map((p) => (
+      {(["light", "dark"] as const).map((p) => (
         <button key={p} type="button" className={`t-${p}`} onClick={() => setTheme(p)} aria-label={t.theme[p]} title={t.theme[p]}>
           {THEME_ICONS[p]}
         </button>

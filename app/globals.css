@@ -43,8 +43,6 @@
 .seg button svg { width: 16px; height: 16px; }
 .theme-switch button { padding: 0; width: 30px; }
 .lang-switch button[aria-pressed="true"],
-:root:not([data-theme-pref]) .theme-switch .t-system,
-:root[data-theme-pref="system"] .theme-switch .t-system,
 :root[data-theme-pref="light"] .theme-switch .t-light,
 :root[data-theme-pref="dark"] .theme-switch .t-dark { background: var(--saffron); color: var(--saffron-ink); }
 

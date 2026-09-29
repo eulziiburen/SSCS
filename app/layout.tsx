@@ -25,7 +25,7 @@ export const viewport: Viewport = {
 
 // Runs before first paint: data-theme-pref drives which switch button looks active,
 // data-theme (only for an explicit choice) overrides the OS color scheme
-const THEME_SCRIPT = `(function(){var p="system";try{p=localStorage.getItem("theme")||"system"}catch(e){}var r=document.documentElement;r.dataset.themePref=p;if(p==="light"||p==="dark")r.dataset.theme=p})()`;
+const THEME_SCRIPT = `(function(){var p=null;try{p=localStorage.getItem("theme")}catch(e){}if(p!=="light"&&p!=="dark")p=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";var r=document.documentElement;r.dataset.themePref=p;r.dataset.theme=p})()`;
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { locale, t } = await getI18n();

@@ -35,7 +35,7 @@ const mn = {
     skip: "Үндсэн агуулга руу шилжих",
     language: "Хэл сонгох",
   },
-  theme: { group: "Өнгөний горим", light: "Цайвар", dark: "Бараан", system: "Системийн тохиргоо" },
+  theme: { group: "Өнгөний горим", light: "Цайвар", dark: "Бараан" },
   kind: { abroad: "Гадаад аялал", local: "Дотоод аялал", day: "Өдрийн аялал" },
   hero: { label: "Онцлох аялал", cta: "Хөтөлбөр үзэх", from: "эхлэх үнэ", prev: "Өмнөх", next: "Дараах", eyebrow: (kind: string, days: number) => `${kind} · ${days} өдөр` },
   search: {
@@ -494,7 +494,7 @@ const en: Dictionary = {
     skip: "Skip to main content",
     language: "Choose language",
   },
-  theme: { group: "Color mode", light: "Light", dark: "Dark", system: "System setting" },
+  theme: { group: "Color mode", light: "Light", dark: "Dark" },
   kind: { abroad: "International", local: "Domestic", day: "Day trips" },
   hero: { label: "Featured tours", cta: "View itinerary", from: "from", prev: "Previous", next: "Next", eyebrow: (kind: string, days: number) => `${kind} · ${days} days` },
   search: {
