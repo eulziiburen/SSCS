@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { toggleTour } from "@/app/st-admin/actions";
+import { deleteTour, toggleTour } from "@/app/st-admin/actions";
+import { ConfirmButton } from "@/components/admin/Controls";
 import { TourVisual } from "@/components/TourVisual";
 import { dateRange, fmt, KIND_LABEL } from "@/lib/data";
-import { getTours } from "@/lib/queries";
+import { getBookings, getTours } from "@/lib/queries";
 
 export const metadata: Metadata = { title: "Аялалууд" };
 
@@ -22,7 +23,8 @@ function Toggle({ id, field, on, label }: { id: number; field: string; on: boole
 
 export default async function ToursAdmin({ searchParams }: PageProps<"/st-admin/tours">) {
   const { saved } = await searchParams;
-  const tours = await getTours({ includeHidden: true });
+  const [tours, bookings] = await Promise.all([getTours({ includeHidden: true }), getBookings()]);
+  const bookingCount = (id: number) => bookings.filter((b) => b.tourId === id && b.type === "tour").length;
   const today = new Date().toISOString().slice(0, 10);
 
   return (
@@ -48,6 +50,9 @@ export default async function ToursAdmin({ searchParams }: PageProps<"/st-admin/
                 <th className="num">Үнэ</th>
                 <th className="num">Суудал</th>
                 <th>Харагдах байдал</th>
+                <th>
+                  <span className="sr-only">Үйлдэл</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -79,6 +84,25 @@ export default async function ToursAdmin({ searchParams }: PageProps<"/st-admin/
                       <Toggle id={t.id} field="published" on={t.published} label="Нийтлэгдсэн" />
                       <Toggle id={t.id} field="featured" on={t.featured} label="Нүүр slider" />
                       <Toggle id={t.id} field="upcoming" on={t.upcoming} label="Ойрын аялал" />
+                    </div>
+                  </td>
+                  <td>
+                    <div className="a-row-actions">
+                      <Link href={`/st-admin/tours/${t.id}`} className="a-btn sm">
+                        Засах
+                      </Link>
+                      <form action={deleteTour}>
+                        <input type="hidden" name="id" value={t.id} />
+                        <ConfirmButton
+                          className="a-btn sm danger"
+                          message={
+                            `“${t.title}” аяллыг устгах уу? Сэргээх боломжгүй.` +
+                            (bookingCount(t.id) ? `\n\nЭнэ аялалд ${bookingCount(t.id)} захиалга бий. Захиалгууд устахгүй, “Захиалгууд” хэсэгт үлдэнэ.` : "")
+                          }
+                        >
+                          Устгах
+                        </ConfirmButton>
+                      </form>
                     </div>
                   </td>
                 </tr>
