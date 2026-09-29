@@ -41,7 +41,10 @@ export async function Footer() {
             </ul>
           </div>
         </div>
-        <div className="copy">© 2026 Soft Travel. {t.footer.rights}</div>
+        <div className="copy">
+          <span>© 2026 Soft Travel</span>
+          <span>{t.footer.rights}</span>
+        </div>
       </div>
     </footer>
   );
