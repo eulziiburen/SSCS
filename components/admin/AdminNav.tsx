@@ -7,12 +7,13 @@ const ITEMS = [
   { href: "/st-admin", label: "Тойм" },
   { href: "/st-admin/bookings", label: "Захиалгууд" },
   { href: "/st-admin/tours", label: "Аялалууд" },
-  { href: "/st-admin/hotels", label: "Зочид буудал" },
+  { href: "/st-admin/hotels", label: "Буудал" },
   { href: "/st-admin/regions", label: "Монгол орон" },
+  { href: "/st-admin/sims", label: "Дата сим" },
   { href: "/st-admin/news", label: "Мэдээ" },
   { href: "/st-admin/reviews", label: "Сэтгэгдэл" },
   { href: "/st-admin/users", label: "Хэрэглэгчид" },
-  { href: "/st-admin/home", label: "Нүүр хуудас" },
+  { href: "/st-admin/home", label: "Нүүр" },
   { href: "/st-admin/settings", label: "Тооцоолуур" },
 ];
 

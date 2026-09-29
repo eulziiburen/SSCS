@@ -140,6 +140,21 @@ export const otpCodes = sqliteTable("otp_codes", {
   createdAt: text("created_at").notNull(),
 });
 
+export const simPlans = sqliteTable("sim_plans", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  countries: text("countries").notNull(), // JSON string[] of ISO codes
+  title: text("title").notNull(),
+  titleEn: text("title_en"),
+  kind: text("kind").notNull(), // SimKind
+  dataAmount: text("data_amount").notNull().default(""),
+  days: integer("days").notNull(),
+  activation: text("activation").notNull().default("anytime"), // SimActivation
+  activateWithin: integer("activate_within"),
+  price: integer("price").notNull(),
+  published: integer("published", { mode: "boolean" }).notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+});
+
 export const settings = sqliteTable("settings", {
   key: text("key").primaryKey(),
   value: text("value").notNull(), // JSON
@@ -152,3 +167,4 @@ export type RegionRow = typeof regions.$inferSelect;
 export type HotelRow = typeof hotels.$inferSelect;
 export type ReviewRow = typeof reviews.$inferSelect;
 export type UserRow = typeof users.$inferSelect;
+export type SimPlanRow = typeof simPlans.$inferSelect;

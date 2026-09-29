@@ -1,8 +1,9 @@
 import { asc, desc, eq } from "drizzle-orm";
 import { db, ensureDb } from "@/db/client";
-import { bookings, hotels, news, regions, reviews, settings, tours, type HotelRow, type RegionRow, type TourRow } from "@/db/schema";
+import { bookings, hotels, news, regions, reviews, settings, simPlans, tours, type SimPlanRow, type HotelRow, type RegionRow, type TourRow } from "@/db/schema";
 import { HOTEL_AMENITIES, HOTEL_CATEGORIES, lines, type Hotel, type HotelAmenity, type HotelCategory, type Region } from "./places";
 import { mergeCalc, type CalcSettings } from "./calc";
+import { parseCountries, SIM_ACTIVATION, SIM_KINDS, type SimActivation, type SimKind, type SimPlan } from "./sims";
 import { mergeStats, type Stat } from "./stats";
 import { daysBetween, SCENE_KEYS, type NewsItem, type SceneKey, type Tour } from "./data";
 
@@ -114,4 +115,26 @@ export async function getReviews({ approvedOnly = true } = {}) {
     .from(reviews)
     .where(approvedOnly ? eq(reviews.status, "approved") : undefined)
     .orderBy(desc(reviews.createdAt));
+}
+
+function toSimPlan(row: SimPlanRow): SimPlan {
+  return {
+    ...row,
+    countries: parseCountries(row.countries),
+    kind: (SIM_KINDS as readonly string[]).includes(row.kind) ? (row.kind as SimKind) : "total",
+    activation: (SIM_ACTIVATION as readonly string[]).includes(row.activation) ? (row.activation as SimActivation) : "anytime",
+  };
+}
+
+export async function getSimPlans({ includeHidden = false } = {}): Promise<SimPlan[]> {
+  await ensureDb();
+  const rows = await db.select().from(simPlans).orderBy(asc(simPlans.sortOrder), asc(simPlans.price));
+  return rows.map(toSimPlan).filter((p) => includeHidden || p.published);
+}
+
+export async function getSimPlan(id: number): Promise<SimPlan | undefined> {
+  if (!Number.isInteger(id)) return undefined;
+  await ensureDb();
+  const [row] = await db.select().from(simPlans).where(eq(simPlans.id, id));
+  return row ? toSimPlan(row) : undefined;
 }

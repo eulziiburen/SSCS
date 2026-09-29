@@ -133,7 +133,7 @@ function ServicesMenu({ onNavigate }: { onNavigate: () => void }) {
         {SERVICE_KEYS.map((k, i) => (
           <li key={k}>
             <Link
-              href={`/services#${k}`}
+              href={k === "sim" ? "/services/sim" : `/services#${k}`}
               onClick={() => {
                 setOpen(false);
                 onNavigate();

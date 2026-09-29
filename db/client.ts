@@ -127,6 +127,20 @@ CREATE TABLE IF NOT EXISTS otp_codes (
   created_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS otp_codes_target ON otp_codes (target, purpose);
+CREATE TABLE IF NOT EXISTS sim_plans (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  countries TEXT NOT NULL,
+  title TEXT NOT NULL,
+  title_en TEXT,
+  kind TEXT NOT NULL,
+  data_amount TEXT NOT NULL DEFAULT '',
+  days INTEGER NOT NULL,
+  activation TEXT NOT NULL DEFAULT 'anytime',
+  activate_within INTEGER,
+  price INTEGER NOT NULL,
+  published INTEGER NOT NULL DEFAULT 1,
+  sort_order INTEGER NOT NULL DEFAULT 0
+);
 CREATE TABLE IF NOT EXISTS images (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   mime TEXT NOT NULL,

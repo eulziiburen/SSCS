@@ -30,9 +30,15 @@ export default async function ServicesPage({ searchParams }: PageProps<"/service
             </span>
             <h2>{t.home.serviceList[i][0]}</h2>
             <p>{t.home.serviceList[i][1]}</p>
-            <Link href={`/services?s=${k}#request`} className="btn ghost sm">
-              {t.svc.request}
-            </Link>
+            {k === "sim" ? (
+              <Link href="/services/sim" className="btn sm">
+                {t.sim.order}
+              </Link>
+            ) : (
+              <Link href={`/services?s=${k}#request`} className="btn ghost sm">
+                {t.svc.request}
+              </Link>
+            )}
           </article>
         ))}
       </div>

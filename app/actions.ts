@@ -9,7 +9,8 @@ import { isEmail, isVoucherAmount } from "@/lib/data";
 import { getDictionary, isLocale, type Locale } from "@/lib/i18n";
 import { DEFAULT_DIAL, dialByIso, formatPhone, isValidPhone } from "@/lib/phone";
 import { HOTEL_CATEGORIES, HOTEL_CATEGORY_MN, type HotelCategory } from "@/lib/places";
-import { getCalcSettings, getHotel, getHotels, getRegions, getTour } from "@/lib/queries";
+import { getCalcSettings, getHotel, getHotels, getRegions, getSimPlan, getTour } from "@/lib/queries";
+import { simSpecMn } from "@/lib/sims";
 import { isServiceKey, SERVICE_MN } from "@/lib/services";
 import { getCurrentUser } from "@/lib/user-auth";
 
@@ -230,4 +231,17 @@ export async function createServiceRequest(input: Contact & { service: string; d
   const note = String(input.note ?? "").trim().slice(0, 1000);
   const details = [date ? `${date}-нд` : null, note ? `Тэмдэглэл: ${note}` : null].filter(Boolean).join(" · ") || null;
   return save(parsed.contact, { type: "service", tourTitle: `Үйлчилгээ: ${SERVICE_MN[input.service]}`, pax, unitPrice: 0, total: 0, details }, input.locale);
+}
+
+export async function createSimOrder(input: Contact & { planId: number; qty: number; startDate: string }): Promise<BookingResult> {
+  const msg = messages(input.locale);
+  const parsed = parseContact(input);
+  if (!parsed.contact) return { ok: false, error: parsed.error };
+  const plan = await getSimPlan(Number(input.planId));
+  if (!plan?.published) return { ok: false, error: msg.notFound };
+  const qty = int(input.qty, 1, 20);
+  if (!qty) return { ok: false, error: msg.pax };
+  const start = input.startDate ? isoDate(input.startDate) : null;
+  const details = [simSpecMn(plan), start ? `${start}-с эхлэх` : null].filter(Boolean).join(" · ");
+  return save(parsed.contact, { type: "service", tourTitle: `Дата сим: ${plan.title}`, pax: qty, unitPrice: plan.price, total: plan.price * qty, details }, input.locale);
 }

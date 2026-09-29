@@ -4,7 +4,8 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db, ensureDb } from "@/db/client";
-import { bookings, hotels, images, news, regions, reviews, settings, tours, users } from "@/db/schema";
+import { bookings, hotels, images, news, regions, reviews, settings, simPlans, tours, users } from "@/db/schema";
+import { parseCountries, SIM_ACTIVATION, SIM_KINDS } from "@/lib/sims";
 import { HOTEL_AMENITIES, HOTEL_CATEGORIES } from "@/lib/places";
 import { ADDONS, CURRENCIES, mergeCalc } from "@/lib/calc";
 import { MAX_STATS, mergeStats } from "@/lib/stats";
@@ -373,4 +374,45 @@ export async function deleteUser(fd: FormData) {
   await db.update(bookings).set({ userId: null }).where(eq(bookings.userId, id));
   await db.delete(users).where(eq(users.id, id));
   revalidatePath("/st-admin/users");
+}
+
+/* ---------- data SIM plans ---------- */
+
+export async function saveSim(fd: FormData) {
+  await requireAuth();
+  const id = Number(fd.get("id")) || null;
+  const path = id ? `/st-admin/sims?edit=${id}` : "/st-admin/sims";
+  const countries = parseCountries(str(fd, "countries"));
+  const kind = str(fd, "kind");
+  const activation = str(fd, "activation");
+  const data = {
+    countries: JSON.stringify(countries),
+    title: str(fd, "title"),
+    titleEn: str(fd, "titleEn") || null,
+    kind: (SIM_KINDS as readonly string[]).includes(kind) ? kind : "total",
+    dataAmount: str(fd, "dataAmount").replace(/\s+/g, "").toUpperCase(),
+    days: Number(str(fd, "days")),
+    activation: (SIM_ACTIVATION as readonly string[]).includes(activation) ? activation : "anytime",
+    activateWithin: Number(str(fd, "activateWithin")) || null,
+    price: Number(str(fd, "price").replace(/[^\d]/g, "")),
+    published: fd.get("published") === "on",
+    sortOrder: Number(str(fd, "sortOrder")) || 0,
+  };
+  if (!countries.length) back(path, "Дор хаяж нэг улсын код оруулна уу (жишээ: JP эсвэл US, CA).");
+  if (!data.title) back(path, "Нэр оруулна уу.");
+  if (data.kind !== "unlimited" && !data.dataAmount) back(path, "Датаны хэмжээ оруулна уу (жишээ: 500MB, 3GB).");
+  if (!(Number.isInteger(data.days) && data.days > 0)) back(path, "Хоногийн тоо буруу байна.");
+  if (!(data.price > 0)) back(path, "Үнэ оруулна уу.");
+
+  if (id) await db.update(simPlans).set(data).where(eq(simPlans.id, id));
+  else await db.insert(simPlans).values(data);
+  refreshSite();
+  redirect("/st-admin/sims");
+}
+
+export async function deleteSim(fd: FormData) {
+  await requireAuth();
+  await db.delete(simPlans).where(eq(simPlans.id, Number(fd.get("id"))));
+  refreshSite();
+  redirect("/st-admin/sims");
 }
