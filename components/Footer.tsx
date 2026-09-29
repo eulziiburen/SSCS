@@ -23,6 +23,7 @@ export async function Footer() {
               <Link href="/tours?kind=day">{t.kind.day}</Link>
             </p>
             <ul className="foot-menu">
+              <li><Link href="/calendar">{t.nav.calendar}</Link></li>
               <li><Link href="/plan">{t.nav.plan}</Link></li>
               <li><Link href="/mongolia">{t.nav.mongolia}</Link></li>
               <li><Link href="/hotels">{t.nav.hotels}</Link></li>

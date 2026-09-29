@@ -108,7 +108,7 @@ function ServicesMenu({ onNavigate }: { onNavigate: () => void }) {
   // A click right after hover-open would otherwise close the menu the pointer just opened
   const hoverOpened = useRef(false);
   const hover = (next: boolean) => (e: React.PointerEvent) => {
-    if (e.pointerType !== "mouse" || !matchMedia("(min-width: 1101px)").matches) return;
+    if (e.pointerType !== "mouse" || !matchMedia("(min-width: 1241px)").matches) return;
     hoverOpened.current = next;
     setOpen(next);
   };
@@ -158,6 +158,7 @@ export function Header() {
 
   const nav = [
     { href: "/tours", label: t.nav.tours },
+    { href: "/calendar", label: t.nav.calendar },
     { href: "/plan", label: t.nav.plan },
     { href: "/mongolia", label: t.nav.mongolia },
     { href: "/hotels", label: t.nav.hotels },
