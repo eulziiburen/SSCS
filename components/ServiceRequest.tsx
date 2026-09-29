@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { createServiceRequest } from "@/app/actions";
-import { SERVICE_ICON, SERVICE_KEYS, type ServiceKey } from "@/lib/services";
+import { SERVICE_KEYS, type ServiceKey } from "@/lib/services";
 import { ContactForm } from "./ContactForm";
 import { useI18n } from "./LocaleProvider";
+import { ServiceIcon } from "./ServiceIcon";
 
 export function ServiceRequest({ initial, names, today }: { initial: ServiceKey; names: Record<ServiceKey, string>; today: string }) {
   const { locale, t } = useI18n();
@@ -22,7 +23,8 @@ export function ServiceRequest({ initial, names, today }: { initial: ServiceKey;
         <div className="chips">
           {SERVICE_KEYS.map((k) => (
             <button key={k} type="button" className="chip" aria-pressed={service === k} onClick={() => setService(k)}>
-              <span aria-hidden="true">{SERVICE_ICON[k]}</span>&nbsp;{names[k]}
+              <ServiceIcon service={k} size={22} />
+              {names[k]}
             </button>
           ))}
         </div>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ServiceIcon } from "@/components/ServiceIcon";
 import { SimCatalog } from "@/components/SimCatalog";
 import { getI18n } from "@/lib/locale";
 import { getSimPlans } from "@/lib/queries";
@@ -18,8 +19,8 @@ export default async function SimPage() {
         <Link href="/">{t.list.home}</Link> <span aria-hidden="true">/</span> <Link href="/services">{t.svc.menu}</Link> <span aria-hidden="true">/</span>{" "}
         <span aria-current="page">{t.sim.title}</span>
       </nav>
-      <h1 className="page-title">
-        <span aria-hidden="true">📶</span> {t.sim.title}
+      <h1 className="page-title with-icon">
+        <ServiceIcon service="sim" size={48} /> {t.sim.title}
       </h1>
       <p className="page-lead">{t.sim.lead}</p>
       <SimCatalog plans={plans} today={today} />

@@ -4,9 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { LOCALES, type Locale } from "@/lib/i18n";
-import { SERVICE_ICON, SERVICE_KEYS } from "@/lib/services";
+import { SERVICE_KEYS } from "@/lib/services";
 import { Logo, MenuIcon, XIcon } from "./Icons";
 import { useI18n } from "./LocaleProvider";
+import { ServiceIcon } from "./ServiceIcon";
 import { useUser } from "./UserProvider";
 
 type ThemePref = "light" | "dark" | "system";
@@ -139,9 +140,7 @@ function ServicesMenu({ onNavigate }: { onNavigate: () => void }) {
                 onNavigate();
               }}
             >
-              <span className="nav-drop-ic" aria-hidden="true">
-                {SERVICE_ICON[k]}
-              </span>
+              <ServiceIcon service={k} size={32} />
               {t.home.serviceList[i][0]}
             </Link>
           </li>

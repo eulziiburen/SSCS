@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ServiceRequest } from "@/components/ServiceRequest";
 import { getI18n } from "@/lib/locale";
-import { isServiceKey, SERVICE_ICON, SERVICE_KEYS, type ServiceKey } from "@/lib/services";
+import { ServiceIcon } from "@/components/ServiceIcon";
+import { isServiceKey, SERVICE_KEYS, type ServiceKey } from "@/lib/services";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
@@ -25,9 +26,7 @@ export default async function ServicesPage({ searchParams }: PageProps<"/service
       <div className="svc-grid">
         {SERVICE_KEYS.map((k, i) => (
           <article key={k} id={k} className="svc-card">
-            <span className="svc-ic" aria-hidden="true">
-              {SERVICE_ICON[k]}
-            </span>
+            <ServiceIcon service={k} size={48} />
             <h2>{t.home.serviceList[i][0]}</h2>
             <p>{t.home.serviceList[i][1]}</p>
             {k === "sim" ? (

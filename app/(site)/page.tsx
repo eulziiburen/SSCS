@@ -4,21 +4,15 @@ import { HeroSlider } from "@/components/HeroSlider";
 import { ReviewButton } from "@/components/ReviewForm";
 import { ArrowIcon } from "@/components/Icons";
 import { SearchForm } from "@/components/SearchForm";
+import { ServiceIcon } from "@/components/ServiceIcon";
 import { Tabs } from "@/components/Tabs";
 import { TourCard } from "@/components/TourCard";
 import { dotDate, fmt, localizeNews, localizeTour, VOUCHER_PRICE, type Kind } from "@/lib/data";
 import { getI18n } from "@/lib/locale";
+import { SERVICE_KEYS } from "@/lib/services";
 import { getHomeStats, getNews, getReviews, getTours } from "@/lib/queries";
 
 const KINDS: Kind[] = ["abroad", "local", "day"];
-
-const SERVICE_ICONS = [
-  <path key="sim" d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9a14.5 14.5 0 0 1 20 0M12 19.5h.01" />,
-  <path key="stay" d="M3 20h18M5 20V11l7-6 7 6v9M10 20v-5h4v5" />,
-  <path key="bus" d="M6 3h12a2 2 0 0 1 2 2v12H4V5a2 2 0 0 1 2-2zM4 11h16M7 17v3M17 17v3M8 14h.01M16 14h.01" />,
-  <path key="guide" d="M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18zM15.5 8.5l-2 5-5 2 2-5z" />,
-  <path key="photo" d="M4 8h3l2-3h6l2 3h3v11H4zM12 9.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7z" />,
-];
 
 export default async function Home() {
   const [{ locale, t }, rawTours, rawNews, stats, approved] = await Promise.all([getI18n(), getTours(), getNews(), getHomeStats(), getReviews()]);
@@ -133,11 +127,7 @@ export default async function Home() {
         <div className="svc">
           {t.home.serviceList.map(([title, text], i) => (
             <article key={title}>
-              <div className="ic">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  {SERVICE_ICONS[i]}
-                </svg>
-              </div>
+              <ServiceIcon service={SERVICE_KEYS[i]} size={44} />
               <h3>{title}</h3>
               <p>{text}</p>
             </article>
