@@ -85,37 +85,54 @@ export default async function TourPage({ params }: PageProps<"/tours/[id]">) {
               <h2 id="prog-h">{t.tour.programme}</h2>
               <span>{t.tour.programmeLead}</span>
             </div>
-            <ol className="prog-days">
-              {(schedule.length
-                ? schedule
-                : outlineFromRoute(tour.route, tour.days).map((o) => ({
-                    day: o.day,
-                    title: "",
-                    items: [{ time: null, text: o.kind === "depart" ? t.tour.outlineDepart(o.stop) : o.kind === "return" ? t.tour.outlineReturn(o.stop) : t.tour.outlineStay(o.stop) }],
-                  }))
-              ).map((d) => {
-                const date = dayDate(tour.startDate, d.day);
-                return (
-                  <li key={d.day} className="prog-day">
-                    <div className="prog-day-head">
-                      <span className="prog-num">{t.tour.day(d.day)}</span>
-                      <time dateTime={date.toISOString().slice(0, 10)}>
-                        {String(date.getUTCMonth() + 1).padStart(2, "0")}.{String(date.getUTCDate()).padStart(2, "0")} · {t.tour.weekdays[date.getUTCDay()]}
-                      </time>
-                      {d.title && <strong>{d.title}</strong>}
-                    </div>
-                    <ul className={`prog-items${d.items.some((it) => it.time) ? "" : " no-times"}`}>
-                      {d.items.map((it, i) => (
-                        <li key={i} className={it.time ? undefined : "untimed"}>
-                          <span className="prog-time">{it.time ?? ""}</span>
-                          <span>{it.text}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
-                );
-              })}
-            </ol>
+            <div className="prog-wrap">
+              <table className="prog-table">
+                <thead>
+                  <tr>
+                    <th scope="col">{t.tour.colTime}</th>
+                    <th scope="col">{t.tour.colActivity}</th>
+                  </tr>
+                </thead>
+                {(schedule.length
+                  ? schedule
+                  : outlineFromRoute(tour.route, tour.days).map((o) => ({
+                      day: o.day,
+                      title: "",
+                      items: [{ time: null, text: o.kind === "depart" ? t.tour.outlineDepart(o.stop) : o.kind === "return" ? t.tour.outlineReturn(o.stop) : t.tour.outlineStay(o.stop) }],
+                    }))
+                ).map((d) => {
+                  const date = dayDate(tour.startDate, d.day);
+                  const timed = d.items.some((it) => it.time);
+                  return (
+                    <tbody key={d.day}>
+                      <tr className="prog-day-row">
+                        <th scope="rowgroup" colSpan={2}>
+                          <span className="prog-num">{t.tour.day(d.day)}</span>
+                          <time dateTime={date.toISOString().slice(0, 10)}>
+                            {String(date.getUTCMonth() + 1).padStart(2, "0")}.{String(date.getUTCDate()).padStart(2, "0")} · {t.tour.weekdays[date.getUTCDay()]}
+                          </time>
+                          {d.title && <strong>{d.title}</strong>}
+                        </th>
+                      </tr>
+                      {d.items.map((it, i) =>
+                        timed ? (
+                          <tr key={i}>
+                            <td className={`prog-time${it.time ? "" : " none"}`}>{it.time ?? ""}</td>
+                            <td>{it.text}</td>
+                          </tr>
+                        ) : (
+                          <tr key={i}>
+                            <td colSpan={2} className="prog-plain">
+                              {it.text}
+                            </td>
+                          </tr>
+                        ),
+                      )}
+                    </tbody>
+                  );
+                })}
+              </table>
+            </div>
             {!schedule.length && <p className="prog-note">{t.tour.outlineNote}</p>}
           </section>
 

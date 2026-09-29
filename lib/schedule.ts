@@ -54,3 +54,35 @@ export function outlineFromRoute(route: string[], days: number): { day: number; 
     return { day: i + 1, stop: route[idx] ?? "", kind };
   });
 }
+
+// Structured form used by the admin editor; round-trips through the text format above
+export type EditRow = { start: string; end: string; text: string; textEn: string };
+export type EditDay = { title: string; titleEn: string; rows: EditRow[] };
+
+export function toEditDays(mn: string | null | undefined, en: string | null | undefined, fallbackDays = 1): EditDay[] {
+  const mnDays = parseSchedule(mn);
+  const enDays = parseSchedule(en);
+  if (!mnDays.length) {
+    return Array.from({ length: Math.max(1, Math.min(fallbackDays, 60)) }, () => ({ title: "", titleEn: "", rows: [{ start: "", end: "", text: "", textEn: "" }] }));
+  }
+  return mnDays.map((d, i) => ({
+    title: d.title,
+    titleEn: enDays[i]?.title ?? "",
+    rows: d.items.map((it, j) => {
+      const [start = "", end = ""] = (it.time ?? "").split("–");
+      return { start, end, text: it.text, textEn: enDays[i]?.items[j]?.text ?? "" };
+    }),
+  }));
+}
+
+export function fromEditDays(days: EditDay[]): { mn: string; en: string } {
+  const line = (r: EditRow, text: string) => (r.start ? `${r.start}${r.end ? `–${r.end}` : ""} ${text}` : text);
+  const kept = days.map((d) => ({ ...d, rows: d.rows.filter((r) => r.text.trim()) })).filter((d) => d.rows.length || d.title.trim());
+  const mn = kept.flatMap((d, i) => [`${i + 1}-р өдөр${d.title.trim() ? `: ${d.title.trim()}` : ""}`, ...d.rows.map((r) => line(r, r.text.trim()))]).join("\n");
+  const hasEn = kept.some((d) => d.titleEn.trim() || d.rows.some((r) => r.textEn.trim()));
+  // Rows without an English text fall back to the Mongolian one so the English schedule never has gaps
+  const en = hasEn
+    ? kept.flatMap((d, i) => [`Day ${i + 1}${d.titleEn.trim() ? `: ${d.titleEn.trim()}` : ""}`, ...d.rows.map((r) => line(r, r.textEn.trim() || r.text.trim()))]).join("\n")
+    : "";
+  return { mn, en };
+}

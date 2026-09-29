@@ -7,6 +7,7 @@ import { imageUrl } from "../TourVisual";
 import { ConfirmButton, SubmitButton } from "./Controls";
 import { useFormAction } from "./useFormAction";
 import { ImageField } from "./ImageField";
+import { ScheduleEditor } from "./ScheduleEditor";
 
 const on = (b: boolean | undefined) => (b ? "on" : "");
 
@@ -107,20 +108,9 @@ export function TourForm({ tour: t }: { tour?: Tour }) {
         <section className="a-card">
           <div>
             <h2>Хөтөлбөр (цагийн хуваарь)</h2>
-            <p className="a-hint">
-              “1-р өдөр: гарчиг” гэж өдрийг эхлүүлээд доор нь мөр бүрт нэг үйл ажиллагаа бичнэ. Мөрийн эхэнд “08:00” эсвэл “10:30–12:40” гэж цаг бичвэл цагийн баганад гарна. Хоосон үлдээвэл маршрутаас өдөр бүрийн товч тойм автоматаар гарна.
-            </p>
+            <p className="a-hint">Өдөр бүрт цаг, үйл ажиллагааг мөр мөрөөр нь оруулна. Сайт дээр хүснэгт хэлбэрээр гарна. Бүгдийг хоосон үлдээвэл маршрутаас өдөр бүрийн товч тойм автоматаар гарна.</p>
           </div>
-          <div className="field">
-            <label htmlFor="schedule">Хөтөлбөр</label>
-            <textarea
-              id="schedule"
-              name="schedule"
-              rows={10}
-              defaultValue={d.schedule}
-              placeholder={"1-р өдөр: Улаанбаатар – Манжуур\n07:30 Чингис хаан нисэх онгоцны буудалд цуглах\n09:30–11:40 Манжуур руу нисэх\n14:00 Зочид буудалд байрлах\n18:00 Оройн хоол\n2-р өдөр: Хотын аялал\n09:00 Матрёшка цогцолбор\nОрой чөлөөт цаг"}
-            />
-          </div>
+          <ScheduleEditor initialMn={d.schedule} initialEn={d.scheduleEn} defaultDays={t?.days ?? 1} />
         </section>
 
         <section className="a-card">
@@ -184,10 +174,6 @@ export function TourForm({ tour: t }: { tour?: Tour }) {
           <div className="field">
             <label htmlFor="routeEn">Route — one stop per line, same order as Mongolian</label>
             <textarea id="routeEn" name="routeEn" lang="en" rows={4} defaultValue={d.routeEn} />
-          </div>
-          <div className="field">
-            <label htmlFor="scheduleEn">Programme — “Day 1: title”, then “08:00 activity” lines</label>
-            <textarea id="scheduleEn" name="scheduleEn" lang="en" rows={6} defaultValue={d.scheduleEn} />
           </div>
         </section>
 
