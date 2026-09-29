@@ -821,3 +821,25 @@ svg.hotel-ph path { stroke: color-mix(in srgb, var(--sky) 60%, var(--surface)); 
   .sch-table tr { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 8px 0; border-bottom: 1px dashed var(--line); }
   .sch-table td:nth-child(3), .sch-table td:nth-child(4), .sch-table td:nth-child(5) { grid-column: 1 / -1; }
 }
+
+/* admin: route editor */
+.rte { display: flex; flex-direction: column; gap: 10px; }
+.rte-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; position: relative; }
+.rte-list li { display: grid; grid-template-columns: 30px 1fr 1fr auto; gap: 8px; align-items: center; position: relative; }
+/* dashed line joining the stop numbers */
+.rte-list li:not(:last-child)::after { content: ""; position: absolute; left: 14px; top: 30px; height: calc(100% - 18px); border-left: 2px dashed var(--line); }
+.rte-dot { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800; color: var(--saffron); background: var(--surface); border: 2px solid var(--saffron); position: relative; z-index: 1; }
+.rte-list li:first-child .rte-dot, .rte-list li:last-child .rte-dot { background: var(--saffron); color: #fff; }
+.rte input { width: 100%; font: inherit; font-size: 14px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; min-height: 38px; }
+.rte input:focus { border-color: var(--sky); outline: none; }
+.rte-tools { white-space: nowrap; }
+.rte-tools button { width: 28px; height: 28px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--muted); cursor: pointer; margin-left: 2px; }
+.rte-tools button:hover:not(:disabled) { color: var(--ink); border-color: var(--muted); }
+.rte-tools button:disabled { opacity: 0.35; cursor: default; }
+.rte-tools .del:hover:not(:disabled) { color: var(--danger); border-color: var(--danger); }
+.rte-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.sch-day > .a-btn, .rte-foot .a-btn { align-self: flex-start; }
+@media (max-width: 700px) {
+  .rte-list li { grid-template-columns: 30px 1fr auto; }
+  .rte-list li input[lang="en"] { grid-column: 2; grid-row: 2; }
+}

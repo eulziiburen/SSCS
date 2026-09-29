@@ -7,6 +7,7 @@ import { imageUrl } from "../TourVisual";
 import { ConfirmButton, SubmitButton } from "./Controls";
 import { useFormAction } from "./useFormAction";
 import { ImageField } from "./ImageField";
+import { RouteEditor } from "./RouteEditor";
 import { ScheduleEditor } from "./ScheduleEditor";
 
 const on = (b: boolean | undefined) => (b ? "on" : "");
@@ -100,8 +101,8 @@ export function TourForm({ tour: t }: { tour?: Tour }) {
             </div>
           </div>
           <div className="field">
-            <label htmlFor="route">Маршрут — мөр бүрт нэг цэг</label>
-            <textarea id="route" name="route" rows={5} defaultValue={d.route} required />
+            <span className="label">Маршрут</span>
+            <RouteEditor initialMn={d.route} initialEn={d.routeEn} />
           </div>
         </section>
 
@@ -170,10 +171,6 @@ export function TourForm({ tour: t }: { tour?: Tour }) {
               <label htmlFor="heroEyebrowEn">Slider label</label>
               <input id="heroEyebrowEn" name="heroEyebrowEn" lang="en" defaultValue={d.heroEyebrowEn} placeholder="e.g. Only 2 seats left" />
             </div>
-          </div>
-          <div className="field">
-            <label htmlFor="routeEn">Route — one stop per line, same order as Mongolian</label>
-            <textarea id="routeEn" name="routeEn" lang="en" rows={4} defaultValue={d.routeEn} />
           </div>
         </section>
 
