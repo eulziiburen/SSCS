@@ -19,12 +19,14 @@ function smtp() {
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
   if (!user || !pass) return null;
+  const host = (process.env.SMTP_HOST || "smtp.gmail.com").trim();
   const port = Number(process.env.SMTP_PORT) || 465;
   transport ??= nodemailer.createTransport({
-    host: process.env.SMTP_HOST || "smtp.gmail.com",
+    host,
     port,
     secure: port === 465, // 587 upgrades with STARTTLS instead
-    auth: { user, pass: pass.replace(/\s/g, "") }, // Google shows app passwords in groups of four
+    // Google shows app passwords in groups of four; other providers' passwords may contain real spaces
+    auth: { user: user.trim(), pass: host === "smtp.gmail.com" ? pass.replace(/\s/g, "") : pass },
   });
   return { transport, user };
 }
