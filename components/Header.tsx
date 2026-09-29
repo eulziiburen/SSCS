@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LOCALES, type Locale } from "@/lib/i18n";
+import { SERVICE_ICON, SERVICE_KEYS } from "@/lib/services";
 import { Logo, MenuIcon, XIcon } from "./Icons";
 import { useI18n } from "./LocaleProvider";
 import { useUser } from "./UserProvider";
@@ -79,6 +80,77 @@ function LangSwitch() {
   );
 }
 
+// "Services ▾" disclosure: opens on click (and hover with a mouse), closes on Escape, outside click or navigation
+function ServicesMenu({ onNavigate }: { onNavigate: () => void }) {
+  const { t } = useI18n();
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+
+  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => !root.current?.contains(e.target as Node) && setOpen(false);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setOpen(false);
+      root.current?.querySelector("button")?.focus();
+    };
+    addEventListener("pointerdown", onDown);
+    addEventListener("keydown", onKey);
+    return () => {
+      removeEventListener("pointerdown", onDown);
+      removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  // A click right after hover-open would otherwise close the menu the pointer just opened
+  const hoverOpened = useRef(false);
+  const hover = (next: boolean) => (e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse" || !matchMedia("(min-width: 1101px)").matches) return;
+    hoverOpened.current = next;
+    setOpen(next);
+  };
+
+  return (
+    <div className={`nav-drop${open ? " open" : ""}`} ref={root} onPointerEnter={hover(true)} onPointerLeave={hover(false)}>
+      <button
+        type="button"
+        className={pathname.startsWith("/services") ? "active" : undefined}
+        aria-expanded={open}
+        aria-controls="services-menu"
+        onClick={() => {
+          if (hoverOpened.current) hoverOpened.current = false;
+          else setOpen((o) => !o);
+        }}
+      >
+        {t.svc.menu}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+      <ul id="services-menu" className="nav-drop-menu">
+        {SERVICE_KEYS.map((k, i) => (
+          <li key={k}>
+            <Link
+              href={`/services#${k}`}
+              onClick={() => {
+                setOpen(false);
+                onNavigate();
+              }}
+            >
+              <span className="nav-drop-ic" aria-hidden="true">
+                {SERVICE_ICON[k]}
+              </span>
+              {t.home.serviceList[i][0]}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function Header() {
   const { t } = useI18n();
   const user = useUser();
@@ -114,6 +186,7 @@ export function Header() {
               {n.label}
             </Link>
           ))}
+          <ServicesMenu onNavigate={() => setOpen(false)} />
           <div className="nav-tools">
             <LangSwitch />
             <ThemeSwitch />

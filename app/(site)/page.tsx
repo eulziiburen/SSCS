@@ -126,6 +126,9 @@ export default async function Home() {
             <h2 id="svc-h">{t.home.services}</h2>
             <p>{t.home.servicesLead}</p>
           </div>
+          <Link className="more" href="/services">
+            {t.svc.request} <ArrowIcon />
+          </Link>
         </div>
         <div className="svc">
           {t.home.serviceList.map(([title, text], i) => (

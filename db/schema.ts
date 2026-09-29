@@ -29,7 +29,7 @@ export const tours = sqliteTable("tours", {
 export const bookings = sqliteTable("bookings", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   code: text("code").notNull().unique(),
-  type: text("type", { enum: ["tour", "voucher", "hotel", "custom"] }).notNull(),
+  type: text("type", { enum: ["tour", "voucher", "hotel", "custom", "service"] }).notNull(),
   tourId: integer("tour_id"),
   tourTitle: text("tour_title").notNull(),
   name: text("name").notNull(), // "Овог Нэр", kept for display and older rows

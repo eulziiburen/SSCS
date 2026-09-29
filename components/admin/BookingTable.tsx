@@ -4,7 +4,7 @@ import type { BookingRow } from "@/db/schema";
 import { BOOKING_STATUS, fmt } from "@/lib/data";
 import { AutoSelect, ConfirmButton } from "./Controls";
 
-const TYPE_LABEL: Record<BookingRow["type"], string> = { tour: "Аялал", voucher: "Эрхийн бичиг", hotel: "Буудал", custom: "Өөрийн аялал" };
+const TYPE_LABEL: Record<BookingRow["type"], string> = { tour: "Аялал", voucher: "Эрхийн бичиг", hotel: "Буудал", custom: "Өөрийн аялал", service: "Үйлчилгээ" };
 
 const when = (iso: string) => {
   const d = new Date(iso);

@@ -694,3 +694,36 @@ svg.hotel-ph path { stroke: color-mix(in srgb, var(--sky) 60%, var(--surface)); 
 @media (max-width: 560px) { .prog-items li { grid-template-columns: 86px 1fr; gap: 8px; padding: 8px 12px; } .prog-time { font-size: 12.5px; } }
 .prog-items.no-times li { grid-template-columns: 1fr; }
 .prog-items.no-times .prog-time { display: none; }
+
+/* header "Services" dropdown */
+.nav-drop { position: relative; }
+.nav-drop > button { display: inline-flex; align-items: center; gap: 4px; border: 0; background: none; padding: 6px 0; font: inherit; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; }
+.nav-drop > button:hover, .nav-drop.open > button, .nav-drop > button.active { color: var(--ink); }
+.nav-drop > button.active { border-color: var(--saffron); }
+.nav-drop > button svg { transition: transform 0.15s; }
+.nav-drop.open > button svg { transform: rotate(180deg); }
+.nav-drop-menu { list-style: none; margin: 0; padding: 8px; position: absolute; top: calc(100% + 10px); left: -12px; min-width: 220px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); display: grid; gap: 2px; opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity 0.15s, transform 0.15s, visibility 0.15s; z-index: 40; }
+/* bridges the gap so the pointer can travel from the button into the menu */
+.nav-drop-menu::before { content: ""; position: absolute; left: 0; right: 0; top: -12px; height: 12px; }
+.nav-drop.open .nav-drop-menu { opacity: 1; visibility: visible; transform: none; }
+.nav .nav-drop-menu a { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; border: 0; color: var(--ink); font-weight: 600; text-decoration: none; white-space: nowrap; }
+.nav .nav-drop-menu a:hover, .nav .nav-drop-menu a:focus-visible { background: var(--chip); }
+.nav-drop-ic { font-size: 18px; width: 24px; text-align: center; }
+@media (max-width: 1100px) {
+  .nav-drop > button { width: 100%; justify-content: space-between; font-size: 18px; padding: 14px 4px; border-bottom: 1px solid var(--line); color: var(--ink); }
+  .nav-drop-menu { position: static; box-shadow: none; border: 0; border-radius: 0; padding: 4px 0 8px 8px; min-width: 0; transform: none; display: none; }
+  .nav-drop.open .nav-drop-menu { display: grid; }
+  .nav .nav-drop-menu a { font-size: 16px; padding: 12px 8px; }
+}
+
+/* services page */
+.svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin: 8px 0 32px; }
+.svc-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 10px; scroll-margin-top: calc(var(--header-h) + 16px); }
+.svc-card:target { border-color: var(--saffron); box-shadow: 0 0 0 3px color-mix(in srgb, var(--saffron) 25%, transparent); }
+.svc-card h2 { font-size: 16px; }
+.svc-card p { color: var(--muted); font-size: 14px; flex: 1; margin: 0; }
+.svc-card .btn { align-self: flex-start; }
+.svc-ic { font-size: 28px; line-height: 1; }
+.svc-request-card { scroll-margin-top: calc(var(--header-h) + 16px); }
+.svc-request { display: flex; flex-direction: column; gap: 16px; }
+.svc-request h2 { font-size: 20px; }

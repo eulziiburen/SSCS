@@ -10,6 +10,7 @@ import { getDictionary, isLocale, type Locale } from "@/lib/i18n";
 import { DEFAULT_DIAL, dialByIso, formatPhone, isValidPhone } from "@/lib/phone";
 import { HOTEL_CATEGORIES, HOTEL_CATEGORY_MN, type HotelCategory } from "@/lib/places";
 import { getCalcSettings, getHotel, getHotels, getRegions, getTour } from "@/lib/queries";
+import { isServiceKey, SERVICE_MN } from "@/lib/services";
 import { getCurrentUser } from "@/lib/user-auth";
 
 // dial is the ISO country of the phone number (e.g. "MN"); missing means Mongolia for older clients
@@ -216,4 +217,17 @@ export async function submitReview(_prev: ReviewState, fd: FormData): Promise<Re
   });
   revalidatePath("/st-admin", "layout");
   return { ok: true };
+}
+
+export async function createServiceRequest(input: Contact & { service: string; date: string; pax: number; note: string }): Promise<BookingResult> {
+  const msg = messages(input.locale);
+  const parsed = parseContact(input);
+  if (!parsed.contact) return { ok: false, error: parsed.error };
+  if (!isServiceKey(input.service)) return { ok: false, error: msg.notFound };
+  const pax = int(input.pax, 1, 100);
+  if (!pax) return { ok: false, error: msg.pax };
+  const date = input.date ? isoDate(input.date) : null;
+  const note = String(input.note ?? "").trim().slice(0, 1000);
+  const details = [date ? `${date}-нд` : null, note ? `Тэмдэглэл: ${note}` : null].filter(Boolean).join(" · ") || null;
+  return save(parsed.contact, { type: "service", tourTitle: `Үйлчилгээ: ${SERVICE_MN[input.service]}`, pax, unitPrice: 0, total: 0, details }, input.locale);
 }

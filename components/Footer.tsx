@@ -27,7 +27,7 @@ export async function Footer() {
               <li><Link href="/mongolia">{t.nav.mongolia}</Link></li>
               <li><Link href="/hotels">{t.nav.hotels}</Link></li>
               <li><Link href="/calculator">{t.nav.calculator}</Link></li>
-              <li><Link href="/#services">{t.nav.services}</Link></li>
+              <li><Link href="/services">{t.nav.services}</Link></li>
               <li><Link href="/#news">{t.nav.news}</Link></li>
             </ul>
           </div>
