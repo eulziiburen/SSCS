@@ -2,16 +2,20 @@ import type { Metadata, Viewport } from "next";
 import { Noto_Sans } from "next/font/google";
 import { LocaleProvider } from "@/components/LocaleProvider";
 import { getI18n } from "@/lib/locale";
+import { SITE_URL, openGraph } from "@/lib/site";
 import "./globals.css";
 
 // Same typeface as totti.mn, used for headings, body and figures alike.
 const noto = Noto_Sans({ subsets: ["latin", "cyrillic"], weight: ["300", "400", "500", "600", "700", "800"], variable: "--font-noto" });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getI18n();
+  const { locale, t } = await getI18n();
   return {
+    metadataBase: new URL(SITE_URL),
     title: { default: t.meta.title, template: "%s · Soft Travel" },
     description: t.meta.description,
+    openGraph: openGraph({ title: t.meta.title, description: t.meta.description, locale }),
+    twitter: { card: "summary_large_image" },
   };
 }
 

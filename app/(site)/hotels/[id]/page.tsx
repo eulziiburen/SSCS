@@ -8,18 +8,26 @@ import { fmt } from "@/lib/data";
 import { getI18n } from "@/lib/locale";
 import { localizeHotel, localizeRegion, starsLabel } from "@/lib/places";
 import { getHotel, getRegion } from "@/lib/queries";
+import { languageAlternates, openGraph } from "@/lib/site";
 
 async function load(id: string) {
   const [{ locale, t }, raw] = await Promise.all([getI18n(), getHotel(Number(id))]);
-  if (!raw?.published) return { t, hotel: undefined, region: undefined };
+  if (!raw?.published) return { locale, t, hotel: undefined, region: undefined };
   const region = await getRegion(raw.regionCode);
-  return { t, hotel: localizeHotel(raw, locale), region: region ? localizeRegion(region, locale) : undefined };
+  return { locale, t, hotel: localizeHotel(raw, locale), region: region ? localizeRegion(region, locale) : undefined };
 }
 
 export async function generateMetadata({ params }: PageProps<"/hotels/[id]">): Promise<Metadata> {
-  const { t, hotel } = await load((await params).id);
+  const { locale, t, hotel } = await load((await params).id);
   if (!hotel) return {};
-  return { title: hotel.name, description: `${t.hotels.category_[hotel.category]} · ${hotel.city} · ${fmt(hotel.pricePerNight)}` };
+  const description = `${t.hotels.category_[hotel.category]} · ${hotel.city} · ${fmt(hotel.pricePerNight)}`;
+  const path = `/hotels/${hotel.id}`;
+  return {
+    title: hotel.name,
+    description,
+    alternates: { canonical: path, languages: languageAlternates(path) },
+    openGraph: openGraph({ title: hotel.name, description, imageId: hotel.imageId, locale }),
+  };
 }
 
 export default async function HotelPage({ params }: PageProps<"/hotels/[id]">) {

@@ -5,7 +5,8 @@ import { BookButton } from "@/components/Booking";
 import { CalendarIcon, CheckIcon, ClockIcon, PhoneIcon, PinIcon, SeatIcon, XIcon } from "@/components/Icons";
 import { TourVisual } from "@/components/TourVisual";
 import { TourCard } from "@/components/TourCard";
-import { dateRange, fmt, localizeTour } from "@/lib/data";
+import { dateRange, fmt, localizeTour, type Tour } from "@/lib/data";
+import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL, jsonLd, languageAlternates, openGraph } from "@/lib/site";
 import { badgeLabel } from "@/lib/i18n";
 import { getI18n } from "@/lib/locale";
 import { getTour, getTours } from "@/lib/queries";
@@ -19,9 +20,43 @@ async function load(id: string) {
 }
 
 export async function generateMetadata({ params }: PageProps<"/tours/[id]">): Promise<Metadata> {
-  const { t, tour } = await load((await params).id);
+  const { locale, t, tour } = await load((await params).id);
   if (!tour) return {};
-  return { title: tour.title, description: `${tour.country} · ${dateRange(tour)} · ${t.tour.daysNights(tour.days)} · ${fmt(tour.price)}` };
+  const description = `${tour.country} · ${dateRange(tour)} · ${t.tour.daysNights(tour.days)} · ${fmt(tour.price)}`;
+  const path = `/tours/${tour.id}`;
+  return {
+    title: tour.title,
+    description,
+    alternates: { canonical: path, languages: languageAlternates(path) },
+    openGraph: openGraph({ title: tour.title, description, imageId: tour.imageId, locale }),
+  };
+}
+
+// Google rich result for a trip: price, availability and the stops along the route.
+function tourJsonLd(tour: Tour, description: string) {
+  const url = `${SITE_URL}/tours/${tour.id}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "TouristTrip",
+    name: tour.title,
+    description,
+    url,
+    image: tour.imageId ? `${SITE_URL}/img/${tour.imageId}` : `${SITE_URL}${DEFAULT_OG_IMAGE.url}`,
+    touristType: tour.kind,
+    itinerary: {
+      "@type": "ItemList",
+      itemListElement: tour.route.map((stop, i) => ({ "@type": "ListItem", position: i + 1, item: { "@type": "Place", name: stop } })),
+    },
+    offers: {
+      "@type": "Offer",
+      price: tour.price,
+      priceCurrency: "MNT",
+      availability: tour.seats > 0 ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
+      validThrough: tour.startDate,
+      url,
+    },
+    provider: { "@type": "TravelAgency", name: SITE_NAME, url: SITE_URL },
+  };
 }
 
 export default async function TourPage({ params }: PageProps<"/tours/[id]">) {
@@ -37,6 +72,10 @@ export default async function TourPage({ params }: PageProps<"/tours/[id]">) {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLd(tourJsonLd(tour, `${tour.country} · ${dateRange(tour)} · ${t.tour.daysNights(tour.days)}`))}
+      />
       <div className="detail-hero">
         <TourVisual imageId={tour.imageId} scene={tour.scene} id="d" priority />
         <div className="shade" />

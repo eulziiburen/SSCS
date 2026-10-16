@@ -10,12 +10,13 @@ import { TourCard } from "@/components/TourCard";
 import { dotDate, fmt, localizeNews, localizeTour, VOUCHER_PRICE, type Kind } from "@/lib/data";
 import { getI18n } from "@/lib/locale";
 import { SERVICE_KEYS } from "@/lib/services";
-import { getHomeStats, getNews, getReviews, getTours } from "@/lib/queries";
+import { getHomeStats, getNews, getReviews, getSocial, getTours } from "@/lib/queries";
+import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL, jsonLd } from "@/lib/site";
 
 const KINDS: Kind[] = ["abroad", "local", "day"];
 
 export default async function Home() {
-  const [{ locale, t }, rawTours, rawNews, stats, approved] = await Promise.all([getI18n(), getTours(), getNews(), getHomeStats(), getReviews()]);
+  const [{ locale, t }, rawTours, rawNews, stats, approved, social] = await Promise.all([getI18n(), getTours(), getNews(), getHomeStats(), getReviews(), getSocial()]);
   // Until travelers have posted their own, the original sample reviews keep the section from looking empty
   const reviews = approved.length
     ? approved.slice(0, 6).map((r) => ({ key: String(r.id), name: r.name, trip: r.trip ?? "", text: r.text, rating: r.rating }))
@@ -38,8 +39,30 @@ export default async function Home() {
     price: x.price,
   }));
 
+  // Site-wide identity for Google: name, logo, social profiles and, once travelers have
+  // posted real reviews, their average (the sample reviews are never counted).
+  const agencyJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "TravelAgency",
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: `${SITE_URL}/brand/logo.png`,
+    image: `${SITE_URL}${DEFAULT_OG_IMAGE.url}`,
+    description: t.meta.description,
+    sameAs: Object.values(social).filter(Boolean),
+    ...(approved.length && {
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: (approved.reduce((sum, r) => sum + r.rating, 0) / approved.length).toFixed(1),
+        reviewCount: approved.length,
+        bestRating: 5,
+      },
+    }),
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(agencyJsonLd)} />
       {slides.length > 0 && <HeroSlider slides={slides} />}
 
       <div className="wrap search-float">
