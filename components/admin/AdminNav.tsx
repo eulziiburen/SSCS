@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const ITEMS = [
+const ITEMS: { href: string; label: string; plain?: boolean }[] = [
   { href: "/st-admin", label: "Тойм" },
   { href: "/st-admin/bookings", label: "Захиалгууд" },
   { href: "/st-admin/tours", label: "Аялалууд" },
@@ -15,6 +15,8 @@ const ITEMS = [
   { href: "/st-admin/users", label: "Хэрэглэгчид" },
   { href: "/st-admin/home", label: "Нүүр" },
   { href: "/st-admin/settings", label: "Тооцоолуур" },
+  // A full-page editor served by a route handler, so it is a plain link rather than <Link>
+  { href: "/st-admin/brochure", label: "Танилцуулга", plain: true },
 ];
 
 export function AdminNav({ newCount, pendingReviews }: { newCount: number; pendingReviews: number }) {
@@ -24,11 +26,17 @@ export function AdminNav({ newCount, pendingReviews }: { newCount: number; pendi
       {ITEMS.map((i) => {
         const active = i.href === "/st-admin" ? pathname === "/st-admin" : pathname.startsWith(i.href);
         return (
-          <Link key={i.href} href={i.href} aria-current={active ? "page" : undefined}>
-            {i.label}
-            {i.href === "/st-admin/bookings" && newCount > 0 && <span className="a-count">{newCount}</span>}
-            {i.href === "/st-admin/reviews" && pendingReviews > 0 && <span className="a-count">{pendingReviews}</span>}
-          </Link>
+          i.plain ? (
+            <a key={i.href} href={i.href}>
+              {i.label}
+            </a>
+          ) : (
+            <Link key={i.href} href={i.href} aria-current={active ? "page" : undefined}>
+              {i.label}
+              {i.href === "/st-admin/bookings" && newCount > 0 && <span className="a-count">{newCount}</span>}
+              {i.href === "/st-admin/reviews" && pendingReviews > 0 && <span className="a-count">{pendingReviews}</span>}
+            </Link>
+          )
         );
       })}
     </nav>
